@@ -58,6 +58,12 @@ document.getElementById('search').addEventListener('keyup', function() {
                     <td>${a.status}</td>
                     <td>
                         <a href="/appointments/${a.id}/edit">Edit</a>
+
+                        <form action="/appointments/${a.id}" method="POST" style="display:inline;">
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="submit">Delete</button>
+                        </form>
                     </td>
                 </tr>`;
             });
