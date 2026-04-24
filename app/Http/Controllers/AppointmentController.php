@@ -6,6 +6,8 @@ use App\Models\Appointment;
 use App\Models\User;
 use App\Models\Service;
 use Illuminate\Http\Request;
+use App\Mail\AppointmentCreatedMail;
+use Illuminate\Support\Facades\Mail;
 
 class AppointmentController extends Controller
 {
@@ -26,7 +28,13 @@ class AppointmentController extends Controller
 
     public function store(Request $request)
     {
-        Appointment::create($request->all());
+        $appointment = Appointment::create($request->all());
+
+        $appointment->load(['patient', 'doctor', 'service']);
+
+        Mail::to($appointment->patient->email)
+            ->send(new AppointmentCreatedMail($appointment));
+
         return redirect()->route('appointments.index');
     }
 
