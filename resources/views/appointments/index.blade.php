@@ -26,16 +26,26 @@
         <td>
             <a href="{{ route('appointments.edit', $a->id) }}">Edit</a>
 
-            <form action="{{ route('appointments.destroy', $a->id) }}" method="POST">
-                @csrf
-                @method('DELETE')
-                <button type="submit">Delete</button>
-            </form>
+            <button onclick="openModal({{ $a->id }})">Delete</button>
         </td>
     </tr>
     @endforeach
 </table>
 
+<!-- MODAL -->
+<div id="deleteModal" style="display:none; position:fixed; top:30%; left:40%; background:white; padding:20px; border:1px solid black;">
+    <p>Are you sure you want to delete this appointment?</p>
+
+    <form id="deleteForm" method="POST">
+        @csrf
+        @method('DELETE')
+        <button type="submit">Yes Delete</button>
+    </form>
+
+    <button onclick="closeModal()">Cancel</button>
+</div>
+
+<!-- AXIOS -->
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script>
@@ -58,12 +68,7 @@ document.getElementById('search').addEventListener('keyup', function() {
                     <td>${a.status}</td>
                     <td>
                         <a href="/appointments/${a.id}/edit">Edit</a>
-
-                        <form action="/appointments/${a.id}" method="POST" style="display:inline;">
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                            <input type="hidden" name="_method" value="DELETE">
-                            <button type="submit">Delete</button>
-                        </form>
+                        <button onclick="openModal(${a.id})">Delete</button>
                     </td>
                 </tr>`;
             });
@@ -80,4 +85,18 @@ document.getElementById('search').addEventListener('keyup', function() {
                 </tr>` + rows;
         });
 });
+</script>
+
+<!-- MODAL JS -->
+<script>
+function openModal(id) {
+    document.getElementById('deleteModal').style.display = 'block';
+
+    let form = document.getElementById('deleteForm');
+    form.action = '/appointments/' + id;
+}
+
+function closeModal() {
+    document.getElementById('deleteModal').style.display = 'none';
+}
 </script>
