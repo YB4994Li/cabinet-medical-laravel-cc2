@@ -13,7 +13,21 @@ class AppointmentController extends Controller
 {
     public function index()
     {
-        $appointments = Appointment::with(['patient', 'doctor', 'service'])->paginate(5);
+        $user = auth()->user();
+
+        if ($user->role === 'admin') {
+            $appointments = Appointment::with(['patient', 'doctor', 'service'])
+                ->paginate(5);
+        } elseif ($user->role === 'doctor') {
+            $appointments = Appointment::with(['patient', 'doctor', 'service'])
+                ->where('doctor_id', $user->id)
+                ->paginate(5);
+        } else {
+            $appointments = Appointment::with(['patient', 'doctor', 'service'])
+                ->where('patient_id', $user->id)
+                ->paginate(5);
+        }
+
         return view('appointments.index', compact('appointments'));
     }
 
