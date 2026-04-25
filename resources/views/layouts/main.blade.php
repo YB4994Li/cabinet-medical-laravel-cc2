@@ -58,6 +58,13 @@
                    class="block px-4 py-3 rounded-xl font-bold {{ request()->routeIs('services.*') ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-100' }}">
                     Services
                 </a>
+
+                @if(Auth::user()->role === 'admin')
+                <a href="{{ route('users.index') }}"
+                class="block px-4 py-3 rounded-xl font-bold {{ request()->routeIs('users.*') ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-100' }}">
+                    Users
+                </a>
+                @endif
             </nav>
 
             <div class="p-4 border-t border-slate-200">
