@@ -1,31 +1,80 @@
-<h1>Services</h1>
+@extends('layouts.main')
 
-<a href="{{ route('services.create') }}">Add Service</a>
+@section('content')
+<div class="flex justify-between items-start mb-8">
+    <div>
+        <h1 class="text-4xl font-extrabold text-slate-900">Services</h1>
+        <p class="text-slate-500 mt-2">Manage medical services, pricing, and consultation durations.</p>
+    </div>
 
-<table border="1">
-    <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Price</th>
-        <th>Duration</th>
-        <th>Actions</th>
-    </tr>
+    <a href="{{ route('services.create') }}"
+       class="bg-blue-700 text-white px-5 py-3 rounded-xl font-bold shadow-sm hover:bg-blue-800">
+        + Add Service
+    </a>
+</div>
 
-    @foreach($services as $service)
-    <tr>
-        <td>{{ $service->name }}</td>
-        <td>{{ $service->description }}</td>
-        <td>{{ $service->price }}</td>
-        <td>{{ $service->duration }}</td>
-        <td>
-            <a href="{{ route('services.edit', $service->id) }}">Edit</a>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <p class="text-xs font-bold text-slate-500 uppercase">Total Services</p>
+        <h2 class="text-4xl font-extrabold mt-3">{{ $services->count() }}</h2>
+    </div>
 
-            <form action="{{ route('services.destroy', $service->id) }}" method="POST">
-                @csrf
-                @method('DELETE')
-                <button type="submit">Delete</button>
-            </form>
-        </td>
-    </tr>
-    @endforeach
-</table>
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <p class="text-xs font-bold text-slate-500 uppercase">Average Duration</p>
+        <h2 class="text-4xl font-extrabold mt-3">{{ round($services->avg('duration')) }} min</h2>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <p class="text-xs font-bold text-slate-500 uppercase">Average Price</p>
+        <h2 class="text-4xl font-extrabold mt-3">{{ round($services->avg('price'), 2) }} DH</h2>
+    </div>
+</div>
+
+<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="p-6 flex justify-between items-center border-b border-slate-200">
+        <div>
+            <h2 class="text-2xl font-bold">Service Directory</h2>
+            <p class="text-slate-500 text-sm mt-1">All available medical services.</p>
+        </div>
+    </div>
+
+    <table class="w-full">
+        <thead class="bg-slate-100 text-slate-600 text-xs uppercase">
+            <tr>
+                <th class="text-left p-4">Service Name</th>
+                <th class="text-left p-4">Description</th>
+                <th class="text-left p-4">Price</th>
+                <th class="text-left p-4">Duration</th>
+                <th class="text-left p-4">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach($services as $service)
+            <tr class="border-t border-slate-100 hover:bg-slate-50">
+                <td class="p-4 font-bold text-slate-900">{{ $service->name }}</td>
+                <td class="p-4 text-slate-600">{{ $service->description }}</td>
+                <td class="p-4 font-semibold">{{ $service->price }} DH</td>
+                <td class="p-4 text-slate-600">{{ $service->duration }} min</td>
+                <td class="p-4">
+                    <div class="flex gap-2">
+                        <a href="{{ route('services.edit', $service->id) }}"
+                           class="px-3 py-1 rounded-lg bg-yellow-100 text-yellow-700 font-bold text-sm">
+                            Edit
+                        </a>
+
+                        <form action="{{ route('services.destroy', $service->id) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button class="px-3 py-1 rounded-lg bg-red-100 text-red-700 font-bold text-sm">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+@endsection
