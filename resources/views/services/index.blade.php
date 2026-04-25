@@ -7,10 +7,12 @@
         <p class="text-slate-500 mt-2">Manage medical services, pricing, and consultation durations.</p>
     </div>
 
+    @if(Auth::user()->role === 'admin')
     <a href="{{ route('services.create') }}"
        class="bg-blue-700 text-white px-5 py-3 rounded-xl font-bold shadow-sm hover:bg-blue-800">
         + Add Service
     </a>
+    @endif
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -45,7 +47,9 @@
                 <th class="text-left p-4">Description</th>
                 <th class="text-left p-4">Price</th>
                 <th class="text-left p-4">Duration</th>
+                @if(Auth::user()->role === 'admin')
                 <th class="text-left p-4">Actions</th>
+                @endif
             </tr>
         </thead>
 
@@ -56,18 +60,21 @@
                 <td class="p-4 text-slate-600">{{ $service->description }}</td>
                 <td class="p-4 font-semibold">{{ $service->price }} DH</td>
                 <td class="p-4 text-slate-600">{{ $service->duration }} min</td>
+                @if(Auth::user()->role === 'admin')
                 <td class="p-4">
                     <div class="flex gap-2">
                         <a href="{{ route('services.edit', $service->id) }}"
-                           class="px-3 py-1 rounded-lg bg-yellow-100 text-yellow-700 font-bold text-sm">
+                        class="px-3 py-1 rounded-lg bg-yellow-100 text-yellow-700 font-bold text-sm">
                             Edit
                         </a>
 
-                        <button type="button"
-                                onclick="openServiceModal({{ $service->id }})"
+                        <button onclick="openServiceModal({{ $service->id }})"
                                 class="px-3 py-1 rounded-lg bg-red-100 text-red-700 font-bold text-sm">
                             Delete
                         </button>
+                    </div>
+                </td>
+                @endif
                     </div>
                 </td>
             </tr>
