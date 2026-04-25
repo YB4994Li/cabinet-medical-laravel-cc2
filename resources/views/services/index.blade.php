@@ -63,13 +63,11 @@
                             Edit
                         </a>
 
-                        <form action="{{ route('services.destroy', $service->id) }}" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button class="px-3 py-1 rounded-lg bg-red-100 text-red-700 font-bold text-sm">
-                                Delete
-                            </button>
-                        </form>
+                        <button type="button"
+                                onclick="openServiceModal({{ $service->id }})"
+                                class="px-3 py-1 rounded-lg bg-red-100 text-red-700 font-bold text-sm">
+                            Delete
+                        </button>
                     </div>
                 </td>
             </tr>
@@ -77,4 +75,35 @@
         </tbody>
     </table>
 </div>
+
+<div id="serviceDeleteModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center">
+    <div class="bg-white rounded-2xl p-6 w-96 shadow-xl">
+        <h2 class="text-xl font-bold mb-2">Delete Service</h2>
+        <p class="text-slate-500 mb-6">Are you sure you want to delete this service?</p>
+
+        <form id="serviceDeleteForm" method="POST" class="flex gap-3">
+            @csrf
+            @method('DELETE')
+
+            <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-xl font-bold">
+                Yes Delete
+            </button>
+
+            <button type="button" onclick="closeServiceModal()" class="bg-slate-100 px-4 py-2 rounded-xl font-bold">
+                Cancel
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openServiceModal(id) {
+    document.getElementById('serviceDeleteModal').classList.remove('hidden');
+    document.getElementById('serviceDeleteForm').action = '/services/' + id;
+}
+
+function closeServiceModal() {
+    document.getElementById('serviceDeleteModal').classList.add('hidden');
+}
+</script>
 @endsection
