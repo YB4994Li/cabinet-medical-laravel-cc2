@@ -13,7 +13,7 @@ class AppointmentController extends Controller
 {
     public function index()
     {
-        $appointments = Appointment::with(['patient', 'doctor', 'service'])->get();
+        $appointments = Appointment::with(['patient', 'doctor', 'service'])->paginate(5);
         return view('appointments.index', compact('appointments'));
     }
 

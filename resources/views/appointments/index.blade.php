@@ -17,7 +17,7 @@
 
     <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
         <p class="text-xs font-bold text-slate-500 uppercase">Total Appointments</p>
-        <h2 class="text-4xl font-extrabold mt-3">{{ $appointments->count() }}</h2>
+        <h2 class="text-4xl font-extrabold mt-3">{{ $appointments->total() }}</h2>
     </div>
 
     <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
@@ -94,6 +94,10 @@
             @endforeach
         </tbody>
     </table>
+
+    <div class="p-6">
+    {{ $appointments->links() }}
+    </div>
 </div>
 
 <div id="deleteModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center">

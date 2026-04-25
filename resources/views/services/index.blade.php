@@ -16,7 +16,7 @@
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
     <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
         <p class="text-xs font-bold text-slate-500 uppercase">Total Services</p>
-        <h2 class="text-4xl font-extrabold mt-3">{{ $services->count() }}</h2>
+        <h2 class="text-4xl font-extrabold mt-3">{{ $services->total() }}</h2>
     </div>
 
     <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
@@ -74,6 +74,9 @@
             @endforeach
         </tbody>
     </table>
+    <div class="p-6">
+    {{ $services->links() }}
+    </div>
 </div>
 
 <div id="serviceDeleteModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center">
