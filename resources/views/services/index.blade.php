@@ -119,7 +119,7 @@
 </div>
 
 <div id="serviceViewModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-    <div class="bg-white rounded-2xl p-6 w-[420px] shadow-xl">
+    <div class="bg-white rounded-2xl p-6 w-[420px] shadow-xl animate-scale">
         <h2 id="viewServiceName" class="text-2xl font-extrabold text-slate-900 mb-3"></h2>
 
         <p id="viewServiceDescription" class="text-slate-600 mb-6 leading-relaxed"></p>
@@ -165,5 +165,11 @@ function openServiceViewModal(name, description, price, duration) {
 function closeServiceViewModal() {
     document.getElementById('serviceViewModal').classList.add('hidden');
 }
+
+document.getElementById('serviceViewModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        this.classList.add('hidden');
+    }
+});
 </script>
 @endsection
