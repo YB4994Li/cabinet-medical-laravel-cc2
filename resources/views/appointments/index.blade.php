@@ -48,70 +48,72 @@
                class="w-72 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
     </div>
 
-    <table class="w-full">
-        <thead class="bg-slate-100 text-slate-600 text-xs uppercase">
-            <tr>
-                <th class="text-left p-4">Patient</th>
-                <th class="text-left p-4">Doctor</th>
-                <th class="text-left p-4">Service</th>
-                <th class="text-left p-4">Date</th>
-                <th class="text-left p-4">Time</th>
-                <th class="text-left p-4">Status</th>
-                <th class="text-left p-4">Actions</th>
-            </tr>
-        </thead>
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-slate-100 text-slate-600 text-xs uppercase">
+                <tr>
+                    <th class="text-left p-4">Patient</th>
+                    <th class="text-left p-4">Doctor</th>
+                    <th class="text-left p-4">Service</th>
+                    <th class="text-left p-4">Date</th>
+                    <th class="text-left p-4">Time</th>
+                    <th class="text-left p-4">Status</th>
+                    <th class="text-left p-4">Actions</th>
+                </tr>
+            </thead>
 
-        <tbody id="appointmentsTable">
-            @foreach($appointments as $a)
-            <tr class="border-t border-slate-100 hover:bg-slate-50">
-                <td class="p-4 font-bold text-slate-900">{{ $a->patient->name }}</td>
-                <td class="p-4 text-slate-600">{{ $a->doctor->name }}</td>
-                <td class="p-4 text-slate-600">{{ $a->service->name }}</td>
-                <td class="p-4 text-slate-600">{{ $a->appointment_date }}</td>
-                <td class="p-4 text-slate-600">{{ $a->appointment_time }}</td>
-                <td class="p-4">
-                    @if($a->status == 'confirmed')
-                        <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">CONFIRMED</span>
-                    @elseif($a->status == 'cancelled')
-                        <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">CANCELLED</span>
-                    @else
-                        <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">PENDING</span>
-                    @endif
-                </td>
-                <td class="p-4">
-                    <div class="flex gap-2">
-                        <a href="{{ route('appointments.edit', $a->id) }}"
-                           class="px-3 py-1 rounded-lg bg-yellow-100 text-yellow-700 font-bold text-sm">
-                            Edit
-                        </a>
-                        <button onclick="openModal({{ $a->id }})"
-                                class="px-3 py-1 rounded-lg bg-red-100 text-red-700 font-bold text-sm">
-                            Delete
-                        </button>
-                        @if(Auth::user()->role === 'doctor' || Auth::user()->role === 'admin')
-                            <form action="{{ route('appointments.updateStatus', $a->id) }}" method="POST" class="flex items-center gap-2">
-                                @csrf
-                                @method('PUT')
-
-                                <select name="status"
-                                        class="border border-slate-200 rounded-lg px-3 py-1 pr-8 bg-white text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="pending" {{ $a->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                                    <option value="confirmed" {{ $a->status == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                                    <option value="cancelled" {{ $a->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                                </select>
-
-                                <button type="submit"
-                                        class="px-3 py-1 rounded-lg bg-green-100 text-green-700 font-bold text-sm">
-                                    Update
-                                </button>
-                            </form>
+            <tbody id="appointmentsTable">
+                @foreach($appointments as $a)
+                <tr class="border-t border-slate-100 hover:bg-slate-50">
+                    <td class="p-4 whitespace-nowrap">{{ $a->patient->name }}</td>
+                    <td class="p-4 whitespace-nowrap">{{ $a->doctor->name }}</td>
+                    <td class="p-4 whitespace-nowrap">{{ $a->service->name }}</td>
+                    <td class="p-4 whitespace-nowrap">{{ $a->appointment_date }}</td>
+                    <td class="p-4 whitespace-nowrap">{{ $a->appointment_time }}</td>
+                    <td class="p-4 whitespace-nowrap">
+                        @if($a->status == 'confirmed')
+                            <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">CONFIRMED</span>
+                        @elseif($a->status == 'cancelled')
+                            <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">CANCELLED</span>
+                        @else
+                            <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">PENDING</span>
                         @endif
-                    </div>
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+                    </td>
+                    <td class="p-4">
+                        <div class="flex items-center gap-2 min-w-max">
+                            <a href="{{ route('appointments.edit', $a->id) }}"
+                            class="px-3 py-1 rounded-lg bg-yellow-100 text-yellow-700 font-bold text-sm">
+                                Edit
+                            </a>
+                            <button onclick="openModal({{ $a->id }})"
+                                    class="px-3 py-1 rounded-lg bg-red-100 text-red-700 font-bold text-sm">
+                                Delete
+                            </button>
+                            @if(Auth::user()->role === 'doctor' || Auth::user()->role === 'admin')
+                                <form action="{{ route('appointments.updateStatus', $a->id) }}" method="POST" class="flex items-center gap-2">
+                                    @csrf
+                                    @method('PUT')
+
+                                    <select name="status"
+                                            class="border border-slate-200 rounded-lg px-3 py-1 pr-8 bg-white text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="pending" {{ $a->status == 'pending' ? 'selected' : '' }}>Pending</option>
+                                        <option value="confirmed" {{ $a->status == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
+                                        <option value="cancelled" {{ $a->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                    </select>
+
+                                    <button type="submit"
+                                            class="px-3 py-1 rounded-lg bg-green-100 text-green-700 font-bold text-sm">
+                                        Update
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 
     <div class="p-6">
     {{ $appointments->links() }}
