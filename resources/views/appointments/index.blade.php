@@ -155,27 +155,80 @@
     </div>
 </div>
 
-<div id="appointmentViewModal" class="fixed inset-0 bg-black/40 hidden flex items-center justify-center z-50">
-    <div class="bg-white rounded-2xl p-6 w-[450px] shadow-xl animate-scale">
-        <h2 class="text-xl font-bold mb-4">Appointment Details</h2>
+<!-- view modal -->
+<div id="appointmentViewModal" 
+     class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-6">
 
-        <div class="space-y-2 text-sm">
-            <p><strong>Patient:</strong> <span id="viewPatient"></span></p>
-            <p><strong>Doctor:</strong> <span id="viewDoctor"></span></p>
-            <p><strong>Service:</strong> <span id="viewService"></span></p>
-            <p><strong>Date:</strong> <span id="viewDate"></span></p>
-            <p><strong>Time:</strong> <span id="viewTime"></span></p>
-            <p><strong>Status:</strong> <span id="viewStatus"></span></p>
+    <div class="bg-white rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-xl animate-scale">
 
-            <p class="mt-3"><strong>Notes:</strong></p>
-            <p id="viewNotes" class="bg-slate-100 p-3 rounded-lg"></p>
+        <!-- HEADER -->
+        <h2 class="text-2xl font-extrabold text-slate-900 mb-2">
+            Appointment Details
+        </h2>
+
+        <p class="text-slate-500 mb-6 leading-relaxed">
+            Full information about this medical appointment.
+        </p>
+
+        <!-- CONTENT -->
+        <div class="space-y-4">
+
+            <!-- Patient -->
+            <div class="bg-slate-100 rounded-xl p-4">
+                <p class="text-xs text-slate-500 font-bold uppercase">Patient</p>
+                <p id="viewPatient" class="text-lg font-bold mt-1 text-slate-900"></p>
+            </div>
+
+            <!-- Doctor -->
+            <div class="bg-slate-100 rounded-xl p-4">
+                <p class="text-xs text-slate-500 font-bold uppercase">Doctor</p>
+                <p id="viewDoctor" class="text-lg font-bold mt-1 text-slate-900"></p>
+            </div>
+
+            <!-- Service + Status -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-100 rounded-xl p-4">
+                    <p class="text-xs text-slate-500 font-bold uppercase">Service</p>
+                    <p id="viewService" class="text-lg font-bold mt-1 text-slate-900"></p>
+                </div>
+
+                <div class="bg-slate-100 rounded-xl p-4">
+                    <p class="text-xs text-slate-500 font-bold uppercase">Status</p>
+                    <p id="viewStatus" class="text-lg font-bold mt-1 text-slate-900"></p>
+                </div>
+            </div>
+
+            <!-- Date + Time -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-100 rounded-xl p-4">
+                    <p class="text-xs text-slate-500 font-bold uppercase">Date</p>
+                    <p id="viewDate" class="text-lg font-bold mt-1 text-slate-900"></p>
+                </div>
+
+                <div class="bg-slate-100 rounded-xl p-4">
+                    <p class="text-xs text-slate-500 font-bold uppercase">Time</p>
+                    <p id="viewTime" class="text-lg font-bold mt-1 text-slate-900"></p>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="bg-slate-100 rounded-xl p-4">
+                <p class="text-xs text-slate-500 font-bold uppercase">Notes</p>
+                <p id="viewNotes" 
+                   class="text-slate-700 mt-1 leading-relaxed break-words whitespace-pre-wrap">
+                </p>
+            </div>
+
         </div>
 
-        <div class="mt-5 text-right">
-            <button onclick="closeAppointmentViewModal()" class="px-4 py-2 bg-slate-200 rounded-lg">
+        <!-- BUTTON -->
+        <div class="mt-6">
+            <button onclick="closeAppointmentViewModal()"
+                    class="w-full bg-blue-700 text-white py-3 rounded-xl font-bold hover:bg-blue-800 transition">
                 Close
             </button>
         </div>
+
     </div>
 </div>
 
