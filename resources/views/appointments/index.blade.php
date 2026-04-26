@@ -98,10 +98,10 @@
                                 View
                             </button>
 
-                            <a href="{{ route('appointments.edit', $a->id) }}"
+                            <!-- <a href="{{ route('appointments.edit', $a->id) }}"
                                class="px-3 py-1 rounded-lg bg-yellow-100 text-yellow-700 font-bold text-sm">
                                 Edit
-                            </a>
+                            </a> -->
 
                             <button onclick="openModal({{ $a->id }})"
                                     class="px-3 py-1 rounded-lg bg-red-100 text-red-700 font-bold text-sm">
