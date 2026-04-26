@@ -47,7 +47,7 @@
     </div>
 
     <div class="overflow-x-auto">
-        <table class="min-w-[1350px] w-full">
+        <table class="min-w-[1200px] w-full">
             <thead class="bg-slate-100 text-slate-600 text-xs uppercase">
                 <tr>
                     <th class="text-left p-4">Patient</th>
@@ -85,28 +85,32 @@
 
                     <td class="p-4 whitespace-nowrap">
                         <div class="flex items-center gap-2">
-                            <button onclick="openAppointmentViewModal(
-                                @js($a->patient->name),
-                                @js($a->doctor->name),
-                                @js($a->service->name),
-                                @js($a->appointment_date),
-                                @js($a->appointment_time),
-                                @js($a->status),
-                                @js($a->notes)
-                            )"
-                            class="px-3 py-1 rounded-lg bg-blue-100 text-blue-700 font-bold text-sm">
+                            <button type="button"
+                                    onclick="openAppointmentViewModal(
+                                        @js($a->patient->name),
+                                        @js($a->doctor->name),
+                                        @js($a->service->name),
+                                        @js($a->appointment_date),
+                                        @js($a->appointment_time),
+                                        @js($a->status),
+                                        @js($a->notes)
+                                    )"
+                                    class="px-3 py-1 rounded-lg bg-blue-100 text-blue-700 font-bold text-sm">
                                 View
                             </button>
 
-                            <!-- <a href="{{ route('appointments.edit', $a->id) }}"
-                               class="px-3 py-1 rounded-lg bg-yellow-100 text-yellow-700 font-bold text-sm">
-                                Edit
-                            </a> -->
+                            @if(Auth::user()->role === 'admin' || Auth::user()->role === 'patient')
+                                <a href="{{ route('appointments.edit', $a->id) }}"
+                                   class="px-3 py-1 rounded-lg bg-yellow-100 text-yellow-700 font-bold text-sm">
+                                    Edit
+                                </a>
 
-                            <button onclick="openModal({{ $a->id }})"
-                                    class="px-3 py-1 rounded-lg bg-red-100 text-red-700 font-bold text-sm">
-                                Delete
-                            </button>
+                                <button type="button"
+                                        onclick="openModal({{ $a->id }})"
+                                        class="px-3 py-1 rounded-lg bg-red-100 text-red-700 font-bold text-sm">
+                                    Delete
+                                </button>
+                            @endif
                         </div>
                     </td>
 
@@ -155,37 +159,23 @@
     </div>
 </div>
 
-<!-- view modal -->
-<div id="appointmentViewModal" 
+<div id="appointmentViewModal"
      class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-6">
-
     <div class="bg-white rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-xl animate-scale">
+        <h2 class="text-2xl font-extrabold text-slate-900 mb-2">Appointment Details</h2>
+        <p class="text-slate-500 mb-6 leading-relaxed">Full information about this medical appointment.</p>
 
-        <!-- HEADER -->
-        <h2 class="text-2xl font-extrabold text-slate-900 mb-2">
-            Appointment Details
-        </h2>
-
-        <p class="text-slate-500 mb-6 leading-relaxed">
-            Full information about this medical appointment.
-        </p>
-
-        <!-- CONTENT -->
         <div class="space-y-4">
-
-            <!-- Patient -->
             <div class="bg-slate-100 rounded-xl p-4">
                 <p class="text-xs text-slate-500 font-bold uppercase">Patient</p>
                 <p id="viewPatient" class="text-lg font-bold mt-1 text-slate-900"></p>
             </div>
 
-            <!-- Doctor -->
             <div class="bg-slate-100 rounded-xl p-4">
                 <p class="text-xs text-slate-500 font-bold uppercase">Doctor</p>
                 <p id="viewDoctor" class="text-lg font-bold mt-1 text-slate-900"></p>
             </div>
 
-            <!-- Service + Status -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-slate-100 rounded-xl p-4">
                     <p class="text-xs text-slate-500 font-bold uppercase">Service</p>
@@ -198,7 +188,6 @@
                 </div>
             </div>
 
-            <!-- Date + Time -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-slate-100 rounded-xl p-4">
                     <p class="text-xs text-slate-500 font-bold uppercase">Date</p>
@@ -211,24 +200,19 @@
                 </div>
             </div>
 
-            <!-- Notes -->
             <div class="bg-slate-100 rounded-xl p-4">
                 <p class="text-xs text-slate-500 font-bold uppercase">Notes</p>
-                <p id="viewNotes" 
-                   class="text-slate-700 mt-1 leading-relaxed break-words whitespace-pre-wrap">
-                </p>
+                <p id="viewNotes" class="text-slate-700 mt-1 leading-relaxed break-words whitespace-pre-wrap"></p>
             </div>
-
         </div>
 
-        <!-- BUTTON -->
         <div class="mt-6">
-            <button onclick="closeAppointmentViewModal()"
+            <button type="button"
+                    onclick="closeAppointmentViewModal()"
                     class="w-full bg-blue-700 text-white py-3 rounded-xl font-bold hover:bg-blue-800 transition">
                 Close
             </button>
         </div>
-
     </div>
 </div>
 
@@ -236,6 +220,13 @@
 
 <script>
 const canUpdateStatus = @json(Auth::user()->role === 'doctor' || Auth::user()->role === 'admin');
+const canEditDelete = @json(Auth::user()->role === 'admin' || Auth::user()->role === 'patient');
+const csrfToken = @json(csrf_token());
+const originalRows = document.getElementById('appointmentsTable').innerHTML;
+
+function safe(value) {
+    return value ?? '';
+}
 
 function statusBadge(status) {
     if (status === 'confirmed') {
@@ -249,16 +240,51 @@ function statusBadge(status) {
     return `<span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">PENDING</span>`;
 }
 
+function actionButtons(a) {
+    let buttons = `
+        <button type="button"
+                onclick='openAppointmentViewModal(
+                    ${JSON.stringify(safe(a.patient?.name))},
+                    ${JSON.stringify(safe(a.doctor?.name))},
+                    ${JSON.stringify(safe(a.service?.name))},
+                    ${JSON.stringify(safe(a.appointment_date))},
+                    ${JSON.stringify(safe(a.appointment_time))},
+                    ${JSON.stringify(safe(a.status))},
+                    ${JSON.stringify(safe(a.notes))}
+                )'
+                class="px-3 py-1 rounded-lg bg-blue-100 text-blue-700 font-bold text-sm">
+            View
+        </button>
+    `;
+
+    if (canEditDelete) {
+        buttons += `
+            <a href="/appointments/${a.id}/edit"
+               class="px-3 py-1 rounded-lg bg-yellow-100 text-yellow-700 font-bold text-sm">
+                Edit
+            </a>
+
+            <button type="button"
+                    onclick="openModal(${a.id})"
+                    class="px-3 py-1 rounded-lg bg-red-100 text-red-700 font-bold text-sm">
+                Delete
+            </button>
+        `;
+    }
+
+    return buttons;
+}
+
 function statusUpdateForm(a) {
     if (!canUpdateStatus) return '';
 
     return `
         <td class="p-4 whitespace-nowrap">
             <form action="/appointments/${a.id}/status" method="POST" class="flex items-center gap-2">
-                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="_token" value="${csrfToken}">
                 <input type="hidden" name="_method" value="PUT">
 
-                <select name="status" class="border border-slate-200 rounded-lg px-3 py-1 pr-8 bg-white text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select name="status" class="border border-slate-200 rounded-lg px-3 py-1 pr-8 bg-white text-sm font-bold">
                     <option value="pending" ${a.status === 'pending' ? 'selected' : ''}>Pending</option>
                     <option value="confirmed" ${a.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
                     <option value="cancelled" ${a.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
@@ -273,34 +299,31 @@ function statusUpdateForm(a) {
 }
 
 document.getElementById('search').addEventListener('keyup', function() {
-    let query = this.value;
+    let query = this.value.trim();
 
-    axios.get('/appointments/search?q=' + query)
+    if (query === '') {
+        document.getElementById('appointmentsTable').innerHTML = originalRows;
+        return;
+    }
+
+    axios.get('/appointments/search?q=' + encodeURIComponent(query))
         .then(response => {
             let rows = '';
 
             response.data.forEach(a => {
                 rows += `
                 <tr class="border-t border-slate-100 hover:bg-slate-50">
-                    <td class="p-4 whitespace-nowrap font-bold text-slate-900">${a.patient.name}</td>
-                    <td class="p-4 whitespace-nowrap text-slate-600">${a.doctor.name}</td>
-                    <td class="p-4 whitespace-nowrap text-slate-600">${a.service.name}</td>
-                    <td class="p-4 whitespace-nowrap text-slate-600">${a.appointment_date}</td>
-                    <td class="p-4 whitespace-nowrap text-slate-600">${a.appointment_time}</td>
+                    <td class="p-4 whitespace-nowrap font-bold text-slate-900">${safe(a.patient?.name)}</td>
+                    <td class="p-4 whitespace-nowrap text-slate-600">${safe(a.doctor?.name)}</td>
+                    <td class="p-4 whitespace-nowrap text-slate-600">${safe(a.service?.name)}</td>
+                    <td class="p-4 whitespace-nowrap text-slate-600">${safe(a.appointment_date)}</td>
+                    <td class="p-4 whitespace-nowrap text-slate-600">${safe(a.appointment_time)}</td>
                     <td class="p-4 whitespace-nowrap">${statusBadge(a.status)}</td>
-
                     <td class="p-4 whitespace-nowrap">
                         <div class="flex items-center gap-2">
-                            <button onclick="openAppointmentViewModal('${a.patient.name}', '${a.doctor.name}', '${a.service.name}', '${a.appointment_date}', '${a.appointment_time}', '${a.status}', '${a.notes ?? ''}')"
-                                    class="px-3 py-1 rounded-lg bg-blue-100 text-blue-700 font-bold text-sm">
-                                View
-                            </button>
-
-                            <a href="/appointments/${a.id}/edit" class="px-3 py-1 rounded-lg bg-yellow-100 text-yellow-700 font-bold text-sm">Edit</a>
-                            <button onclick="openModal(${a.id})" class="px-3 py-1 rounded-lg bg-red-100 text-red-700 font-bold text-sm">Delete</button>
+                            ${actionButtons(a)}
                         </div>
                     </td>
-
                     ${statusUpdateForm(a)}
                 </tr>`;
             });

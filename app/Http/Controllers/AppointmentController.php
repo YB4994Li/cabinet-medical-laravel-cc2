@@ -75,18 +75,32 @@ class AppointmentController extends Controller
 
     public function search(Request $request)
     {
+        $user = auth()->user();
         $query = $request->q;
 
-        $appointments = Appointment::with(['patient', 'doctor', 'service'])
-            ->whereHas('patient', function ($q) use ($query) {
-                $q->where('name', 'like', "%$query%");
-            })
-            ->orWhereHas('doctor', function ($q) use ($query) {
-                $q->where('name', 'like', "%$query%");
-            })
-            ->get();
+        $appointments = Appointment::with(['patient', 'doctor', 'service']);
 
-        return response()->json($appointments);
+        if ($user->role === 'doctor') {
+            $appointments->where('doctor_id', $user->id);
+        } elseif ($user->role === 'patient') {
+            $appointments->where('patient_id', $user->id);
+        }
+
+        if (!empty($query)) {
+            $appointments->where(function ($q) use ($query) {
+                $q->whereHas('patient', function ($p) use ($query) {
+                    $p->where('name', 'like', "%{$query}%");
+                })
+                ->orWhereHas('doctor', function ($d) use ($query) {
+                    $d->where('name', 'like', "%{$query}%");
+                })
+                ->orWhereHas('service', function ($s) use ($query) {
+                    $s->where('name', 'like', "%{$query}%");
+                });
+            });
+        }
+
+        return response()->json($appointments->get());
     }
 
     public function updateStatus(Request $request, Appointment $appointment)
