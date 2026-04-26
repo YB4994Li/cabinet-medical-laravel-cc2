@@ -14,7 +14,6 @@
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-
     <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
         <p class="text-xs font-bold text-slate-500 uppercase">Total Appointments</p>
         <h2 class="text-4xl font-extrabold mt-3">{{ $appointments->total() }}</h2>
@@ -34,7 +33,6 @@
         <p class="text-xs font-bold text-slate-500 uppercase">Cancelled</p>
         <h2 class="text-4xl font-extrabold mt-3">{{ $appointments->where('status', 'cancelled')->count() }}</h2>
     </div>
-
 </div>
 
 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
@@ -49,7 +47,7 @@
     </div>
 
     <div class="overflow-x-auto">
-        <table class="w-full">
+        <table class="min-w-[1350px] w-full">
             <thead class="bg-slate-100 text-slate-600 text-xs uppercase">
                 <tr>
                     <th class="text-left p-4">Patient</th>
@@ -59,17 +57,22 @@
                     <th class="text-left p-4">Time</th>
                     <th class="text-left p-4">Status</th>
                     <th class="text-left p-4">Actions</th>
+
+                    @if(Auth::user()->role === 'doctor' || Auth::user()->role === 'admin')
+                        <th class="text-left p-4">Update Status</th>
+                    @endif
                 </tr>
             </thead>
 
             <tbody id="appointmentsTable">
                 @foreach($appointments as $a)
                 <tr class="border-t border-slate-100 hover:bg-slate-50">
-                    <td class="p-4 whitespace-nowrap">{{ $a->patient->name }}</td>
-                    <td class="p-4 whitespace-nowrap">{{ $a->doctor->name }}</td>
-                    <td class="p-4 whitespace-nowrap">{{ $a->service->name }}</td>
-                    <td class="p-4 whitespace-nowrap">{{ $a->appointment_date }}</td>
-                    <td class="p-4 whitespace-nowrap">{{ $a->appointment_time }}</td>
+                    <td class="p-4 whitespace-nowrap font-bold text-slate-900">{{ $a->patient->name }}</td>
+                    <td class="p-4 whitespace-nowrap text-slate-600">{{ $a->doctor->name }}</td>
+                    <td class="p-4 whitespace-nowrap text-slate-600">{{ $a->service->name }}</td>
+                    <td class="p-4 whitespace-nowrap text-slate-600">{{ $a->appointment_date }}</td>
+                    <td class="p-4 whitespace-nowrap text-slate-600">{{ $a->appointment_time }}</td>
+
                     <td class="p-4 whitespace-nowrap">
                         @if($a->status == 'confirmed')
                             <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">CONFIRMED</span>
@@ -79,49 +82,54 @@
                             <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">PENDING</span>
                         @endif
                     </td>
-                    <td class="p-4">
-                        <button onclick="openAppointmentViewModal(
-                            '{{ $a->patient->name }}',
-                            '{{ $a->doctor->name }}',
-                            '{{ $a->service->name }}',
-                            '{{ $a->appointment_date }}',
-                            '{{ $a->appointment_time }}',
-                            '{{ $a->status }}',
-                            `{{ $a->notes }}`
-                        )"
-                        class="px-3 py-1 rounded-lg bg-blue-100 text-blue-700 font-bold text-sm">
-                            View
-                        </button>
 
-                        <div class="flex items-center gap-2 min-w-max">
+                    <td class="p-4 whitespace-nowrap">
+                        <div class="flex items-center gap-2">
+                            <button onclick="openAppointmentViewModal(
+                                @js($a->patient->name),
+                                @js($a->doctor->name),
+                                @js($a->service->name),
+                                @js($a->appointment_date),
+                                @js($a->appointment_time),
+                                @js($a->status),
+                                @js($a->notes)
+                            )"
+                            class="px-3 py-1 rounded-lg bg-blue-100 text-blue-700 font-bold text-sm">
+                                View
+                            </button>
+
                             <a href="{{ route('appointments.edit', $a->id) }}"
-                            class="px-3 py-1 rounded-lg bg-yellow-100 text-yellow-700 font-bold text-sm">
+                               class="px-3 py-1 rounded-lg bg-yellow-100 text-yellow-700 font-bold text-sm">
                                 Edit
                             </a>
+
                             <button onclick="openModal({{ $a->id }})"
                                     class="px-3 py-1 rounded-lg bg-red-100 text-red-700 font-bold text-sm">
                                 Delete
                             </button>
-                            @if(Auth::user()->role === 'doctor' || Auth::user()->role === 'admin')
-                                <form action="{{ route('appointments.updateStatus', $a->id) }}" method="POST" class="flex items-center gap-2">
-                                    @csrf
-                                    @method('PUT')
-
-                                    <select name="status"
-                                            class="border border-slate-200 rounded-lg px-3 py-1 pr-8 bg-white text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <option value="pending" {{ $a->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                                        <option value="confirmed" {{ $a->status == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                                        <option value="cancelled" {{ $a->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                                    </select>
-
-                                    <button type="submit"
-                                            class="px-3 py-1 rounded-lg bg-green-100 text-green-700 font-bold text-sm">
-                                        Update
-                                    </button>
-                                </form>
-                            @endif
                         </div>
                     </td>
+
+                    @if(Auth::user()->role === 'doctor' || Auth::user()->role === 'admin')
+                    <td class="p-4 whitespace-nowrap">
+                        <form action="{{ route('appointments.updateStatus', $a->id) }}" method="POST" class="flex items-center gap-2">
+                            @csrf
+                            @method('PUT')
+
+                            <select name="status"
+                                    class="border border-slate-200 rounded-lg px-3 py-1 pr-8 bg-white text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="pending" {{ $a->status == 'pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="confirmed" {{ $a->status == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
+                                <option value="cancelled" {{ $a->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                            </select>
+
+                            <button type="submit"
+                                    class="px-3 py-1 rounded-lg bg-green-100 text-green-700 font-bold text-sm">
+                                Update
+                            </button>
+                        </form>
+                    </td>
+                    @endif
                 </tr>
                 @endforeach
             </tbody>
@@ -129,11 +137,11 @@
     </div>
 
     <div class="p-6">
-    {{ $appointments->links() }}
+        {{ $appointments->links() }}
     </div>
 </div>
 
-<div id="deleteModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center">
+<div id="deleteModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50">
     <div class="bg-white rounded-2xl p-6 w-96 shadow-xl">
         <h2 class="text-xl font-bold mb-2">Delete Appointment</h2>
         <p class="text-slate-500 mb-6">Are you sure you want to delete this appointment?</p>
@@ -147,12 +155,8 @@
     </div>
 </div>
 
-<!-- VIEW APPOINTMENT MODAL -->
-<div id="appointmentViewModal"
-     class="fixed inset-0 bg-black/40 hidden flex items-center justify-center z-50">
-
+<div id="appointmentViewModal" class="fixed inset-0 bg-black/40 hidden flex items-center justify-center z-50">
     <div class="bg-white rounded-2xl p-6 w-[450px] shadow-xl animate-scale">
-
         <h2 class="text-xl font-bold mb-4">Appointment Details</h2>
 
         <div class="space-y-2 text-sm">
@@ -168,18 +172,53 @@
         </div>
 
         <div class="mt-5 text-right">
-            <button onclick="closeAppointmentViewModal()"
-                    class="px-4 py-2 bg-slate-200 rounded-lg">
+            <button onclick="closeAppointmentViewModal()" class="px-4 py-2 bg-slate-200 rounded-lg">
                 Close
             </button>
         </div>
-
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script>
+const canUpdateStatus = @json(Auth::user()->role === 'doctor' || Auth::user()->role === 'admin');
+
+function statusBadge(status) {
+    if (status === 'confirmed') {
+        return `<span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">CONFIRMED</span>`;
+    }
+
+    if (status === 'cancelled') {
+        return `<span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">CANCELLED</span>`;
+    }
+
+    return `<span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">PENDING</span>`;
+}
+
+function statusUpdateForm(a) {
+    if (!canUpdateStatus) return '';
+
+    return `
+        <td class="p-4 whitespace-nowrap">
+            <form action="/appointments/${a.id}/status" method="POST" class="flex items-center gap-2">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="_method" value="PUT">
+
+                <select name="status" class="border border-slate-200 rounded-lg px-3 py-1 pr-8 bg-white text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="pending" ${a.status === 'pending' ? 'selected' : ''}>Pending</option>
+                    <option value="confirmed" ${a.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                    <option value="cancelled" ${a.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                </select>
+
+                <button type="submit" class="px-3 py-1 rounded-lg bg-green-100 text-green-700 font-bold text-sm">
+                    Update
+                </button>
+            </form>
+        </td>
+    `;
+}
+
 document.getElementById('search').addEventListener('keyup', function() {
     let query = this.value;
 
@@ -188,30 +227,28 @@ document.getElementById('search').addEventListener('keyup', function() {
             let rows = '';
 
             response.data.forEach(a => {
-                let badge = `<span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">PENDING</span>`;
-
-                if (a.status === 'confirmed') {
-                    badge = `<span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">CONFIRMED</span>`;
-                }
-
-                if (a.status === 'cancelled') {
-                    badge = `<span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">CANCELLED</span>`;
-                }
-
                 rows += `
                 <tr class="border-t border-slate-100 hover:bg-slate-50">
-                    <td class="p-4 font-bold text-slate-900">${a.patient.name}</td>
-                    <td class="p-4 text-slate-600">${a.doctor.name}</td>
-                    <td class="p-4 text-slate-600">${a.service.name}</td>
-                    <td class="p-4 text-slate-600">${a.appointment_date}</td>
-                    <td class="p-4 text-slate-600">${a.appointment_time}</td>
-                    <td class="p-4">${badge}</td>
-                    <td class="p-4">
-                        <div class="flex gap-2">
+                    <td class="p-4 whitespace-nowrap font-bold text-slate-900">${a.patient.name}</td>
+                    <td class="p-4 whitespace-nowrap text-slate-600">${a.doctor.name}</td>
+                    <td class="p-4 whitespace-nowrap text-slate-600">${a.service.name}</td>
+                    <td class="p-4 whitespace-nowrap text-slate-600">${a.appointment_date}</td>
+                    <td class="p-4 whitespace-nowrap text-slate-600">${a.appointment_time}</td>
+                    <td class="p-4 whitespace-nowrap">${statusBadge(a.status)}</td>
+
+                    <td class="p-4 whitespace-nowrap">
+                        <div class="flex items-center gap-2">
+                            <button onclick="openAppointmentViewModal('${a.patient.name}', '${a.doctor.name}', '${a.service.name}', '${a.appointment_date}', '${a.appointment_time}', '${a.status}', '${a.notes ?? ''}')"
+                                    class="px-3 py-1 rounded-lg bg-blue-100 text-blue-700 font-bold text-sm">
+                                View
+                            </button>
+
                             <a href="/appointments/${a.id}/edit" class="px-3 py-1 rounded-lg bg-yellow-100 text-yellow-700 font-bold text-sm">Edit</a>
                             <button onclick="openModal(${a.id})" class="px-3 py-1 rounded-lg bg-red-100 text-red-700 font-bold text-sm">Delete</button>
                         </div>
                     </td>
+
+                    ${statusUpdateForm(a)}
                 </tr>`;
             });
 
@@ -227,9 +264,7 @@ function openModal(id) {
 function closeModal() {
     document.getElementById('deleteModal').classList.add('hidden');
 }
-</script>
 
-<script>
 function openAppointmentViewModal(patient, doctor, service, date, time, status, notes) {
     document.getElementById('viewPatient').innerText = patient;
     document.getElementById('viewDoctor').innerText = doctor;
@@ -237,7 +272,7 @@ function openAppointmentViewModal(patient, doctor, service, date, time, status, 
     document.getElementById('viewDate').innerText = date;
     document.getElementById('viewTime').innerText = time;
     document.getElementById('viewStatus').innerText = status;
-    document.getElementById('viewNotes').innerText = notes;
+    document.getElementById('viewNotes').innerText = notes || 'No notes';
 
     document.getElementById('appointmentViewModal').classList.remove('hidden');
 }
@@ -246,7 +281,6 @@ function closeAppointmentViewModal() {
     document.getElementById('appointmentViewModal').classList.add('hidden');
 }
 
-// close when click outside
 document.getElementById('appointmentViewModal').addEventListener('click', function(e) {
     if (e.target === this) {
         this.classList.add('hidden');
