@@ -88,4 +88,27 @@ class AppointmentController extends Controller
 
         return response()->json($appointments);
     }
+
+    public function updateStatus(Request $request, Appointment $appointment)
+    {
+        $user = auth()->user();
+
+        if ($user->role === 'doctor' && $appointment->doctor_id !== $user->id) {
+            abort(403);
+        }
+
+        if (!in_array($user->role, ['admin', 'doctor'])) {
+            abort(403);
+        }
+
+        $request->validate([
+            'status' => 'required|in:pending,confirmed,cancelled',
+        ]);
+
+        $appointment->update([
+            'status' => $request->status,
+        ]);
+
+        return redirect()->route('appointments.index');
+    }
 }

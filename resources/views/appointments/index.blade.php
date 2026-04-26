@@ -88,6 +88,24 @@
                                 class="px-3 py-1 rounded-lg bg-red-100 text-red-700 font-bold text-sm">
                             Delete
                         </button>
+                        @if(Auth::user()->role === 'doctor' || Auth::user()->role === 'admin')
+                            <form action="{{ route('appointments.updateStatus', $a->id) }}" method="POST" class="flex items-center gap-2">
+                                @csrf
+                                @method('PUT')
+
+                                <select name="status"
+                                        class="border border-slate-200 rounded-lg px-3 py-1 pr-8 bg-white text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="pending" {{ $a->status == 'pending' ? 'selected' : '' }}>Pending</option>
+                                    <option value="confirmed" {{ $a->status == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
+                                    <option value="cancelled" {{ $a->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                </select>
+
+                                <button type="submit"
+                                        class="px-3 py-1 rounded-lg bg-green-100 text-green-700 font-bold text-sm">
+                                    Update
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 </td>
             </tr>

@@ -21,6 +21,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/appointments/search', [AppointmentController::class, 'search'])
         ->name('appointments.search');
 
+    Route::put('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])
+        ->name('appointments.updateStatus');
+
     Route::resource('appointments', AppointmentController::class);
 
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
