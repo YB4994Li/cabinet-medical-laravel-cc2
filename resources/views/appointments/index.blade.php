@@ -80,6 +80,19 @@
                         @endif
                     </td>
                     <td class="p-4">
+                        <button onclick="openAppointmentViewModal(
+                            '{{ $a->patient->name }}',
+                            '{{ $a->doctor->name }}',
+                            '{{ $a->service->name }}',
+                            '{{ $a->appointment_date }}',
+                            '{{ $a->appointment_time }}',
+                            '{{ $a->status }}',
+                            `{{ $a->notes }}`
+                        )"
+                        class="px-3 py-1 rounded-lg bg-blue-100 text-blue-700 font-bold text-sm">
+                            View
+                        </button>
+
                         <div class="flex items-center gap-2 min-w-max">
                             <a href="{{ route('appointments.edit', $a->id) }}"
                             class="px-3 py-1 rounded-lg bg-yellow-100 text-yellow-700 font-bold text-sm">
@@ -134,6 +147,36 @@
     </div>
 </div>
 
+<!-- VIEW APPOINTMENT MODAL -->
+<div id="appointmentViewModal"
+     class="fixed inset-0 bg-black/40 hidden flex items-center justify-center z-50">
+
+    <div class="bg-white rounded-2xl p-6 w-[450px] shadow-xl animate-scale">
+
+        <h2 class="text-xl font-bold mb-4">Appointment Details</h2>
+
+        <div class="space-y-2 text-sm">
+            <p><strong>Patient:</strong> <span id="viewPatient"></span></p>
+            <p><strong>Doctor:</strong> <span id="viewDoctor"></span></p>
+            <p><strong>Service:</strong> <span id="viewService"></span></p>
+            <p><strong>Date:</strong> <span id="viewDate"></span></p>
+            <p><strong>Time:</strong> <span id="viewTime"></span></p>
+            <p><strong>Status:</strong> <span id="viewStatus"></span></p>
+
+            <p class="mt-3"><strong>Notes:</strong></p>
+            <p id="viewNotes" class="bg-slate-100 p-3 rounded-lg"></p>
+        </div>
+
+        <div class="mt-5 text-right">
+            <button onclick="closeAppointmentViewModal()"
+                    class="px-4 py-2 bg-slate-200 rounded-lg">
+                Close
+            </button>
+        </div>
+
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script>
@@ -184,5 +227,30 @@ function openModal(id) {
 function closeModal() {
     document.getElementById('deleteModal').classList.add('hidden');
 }
+</script>
+
+<script>
+function openAppointmentViewModal(patient, doctor, service, date, time, status, notes) {
+    document.getElementById('viewPatient').innerText = patient;
+    document.getElementById('viewDoctor').innerText = doctor;
+    document.getElementById('viewService').innerText = service;
+    document.getElementById('viewDate').innerText = date;
+    document.getElementById('viewTime').innerText = time;
+    document.getElementById('viewStatus').innerText = status;
+    document.getElementById('viewNotes').innerText = notes;
+
+    document.getElementById('appointmentViewModal').classList.remove('hidden');
+}
+
+function closeAppointmentViewModal() {
+    document.getElementById('appointmentViewModal').classList.add('hidden');
+}
+
+// close when click outside
+document.getElementById('appointmentViewModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        this.classList.add('hidden');
+    }
+});
 </script>
 @endsection
