@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use App\Mail\AppointmentCreatedMail;
+use App\Notifications\AppointmentAssignedNotification;
+use App\Notifications\AppointmentStatusUpdatedNotification;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
@@ -59,6 +61,8 @@ class AppointmentController extends Controller
         $appointment = Appointment::create($request->validate($this->appointmentRules()));
 
         $appointment->load(['patient', 'doctor', 'service']);
+
+        $appointment->doctor->notify(new AppointmentAssignedNotification($appointment));
 
         Mail::to($appointment->patient->email)
             ->send(new AppointmentCreatedMail($appointment));
@@ -144,13 +148,25 @@ class AppointmentController extends Controller
             abort(403);
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'status' => 'required|in:pending,confirmed,cancelled',
         ]);
 
+        $oldStatus = $appointment->status;
+
         $appointment->update([
-            'status' => $request->status,
+            'status' => $validated['status'],
         ]);
+
+        if ($oldStatus !== $validated['status'] && in_array($validated['status'], ['confirmed', 'cancelled'])) {
+            $appointment->refresh()->load(['patient', 'doctor', 'service']);
+
+            $appointment->patient->notify(new AppointmentStatusUpdatedNotification(
+                $appointment,
+                $user,
+                $user->role === 'doctor'
+            ));
+        }
 
         return redirect()->route('appointments.index');
     }

@@ -16,7 +16,68 @@
         </div>
 
         <div class="flex items-center gap-6">
-            <button class="relative w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center">
+            @php
+                $unreadNotifications = Auth::user()->unreadNotifications()->latest()->take(5)->get();
+                $unreadNotificationCount = Auth::user()->unreadNotifications()->count();
+            @endphp
+
+            <div class="relative group">
+                <button type="button"
+                        aria-label="Notifications"
+                        class="relative w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0a3 3 0 0 1-6 0m6 0H9" />
+                    </svg>
+
+                    @if($unreadNotificationCount > 0)
+                        <span class="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-red-600 text-white text-xs font-bold flex items-center justify-center">
+                            {{ $unreadNotificationCount > 9 ? '9+' : $unreadNotificationCount }}
+                        </span>
+                    @endif
+                </button>
+
+                <div class="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition absolute right-0 top-12 w-96 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
+                    <div class="p-4 border-b border-slate-200 flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-slate-900">Notifications</p>
+                            <p class="text-xs text-slate-500">{{ $unreadNotificationCount }} unread</p>
+                        </div>
+
+                        @if($unreadNotificationCount > 0)
+                            <form method="POST" action="{{ route('notifications.readAll') }}">
+                                @csrf
+                                <button type="submit" class="text-xs font-bold text-blue-700 hover:text-blue-800">
+                                    Mark all read
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+
+                    <div class="max-h-96 overflow-y-auto">
+                        @forelse($unreadNotifications as $notification)
+                            <form method="POST" action="{{ route('notifications.read', $notification->id) }}">
+                                @csrf
+                                <button type="submit" class="w-full text-left p-4 border-b border-slate-100 hover:bg-slate-50">
+                                    <span class="block font-bold text-slate-900">
+                                        {{ $notification->data['title'] ?? 'Notification' }}
+                                    </span>
+                                    <span class="block text-sm text-slate-600 mt-1 leading-relaxed">
+                                        {{ $notification->data['message'] ?? '' }}
+                                    </span>
+                                    <span class="block text-xs text-slate-400 mt-2">
+                                        {{ $notification->created_at->diffForHumans() }}
+                                    </span>
+                                </button>
+                            </form>
+                        @empty
+                            <div class="p-6 text-center text-sm text-slate-500">
+                                No new notifications.
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+            <button class="hidden relative w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 items-center justify-center">
                 🔔
                 <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
