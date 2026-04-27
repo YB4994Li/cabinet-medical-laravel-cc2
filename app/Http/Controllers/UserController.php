@@ -31,6 +31,10 @@ class UserController extends Controller
             'role' => $request->role,
         ]);
 
+        if ($request->role !== 'doctor') {
+            $user->services()->detach();
+        }
+
         return redirect()->route('users.index');
     }
 }

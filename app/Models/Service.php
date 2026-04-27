@@ -20,4 +20,10 @@ class Service extends Model
     {
         return $this->hasMany(Appointment::class);
     }
+
+    public function doctors()
+    {
+        return $this->belongsToMany(User::class, 'doctor_service', 'service_id', 'doctor_id')
+            ->withTimestamps();
+    }
 }

@@ -121,6 +121,11 @@
                 </a>
 
                 @if(Auth::user()->role === 'admin')
+                <a href="{{ route('doctors.index') }}"
+                   class="block px-4 py-3 rounded-xl font-bold {{ request()->routeIs('doctors.*') ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-100' }}">
+                    Doctors
+                </a>
+
                 <a href="{{ route('users.index') }}"
                 class="block px-4 py-3 rounded-xl font-bold {{ request()->routeIs('users.*') ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-100' }}">
                     Users

@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\UserController;
 
@@ -26,6 +27,9 @@ Route::middleware(['auth'])->group(function () {
         ->name('appointments.updateStatus');
 
     Route::resource('appointments', AppointmentController::class);
+
+    Route::resource('doctors', DoctorController::class)
+        ->except(['show', 'destroy']);
 
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])
         ->name('notifications.read');

@@ -19,6 +19,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Appointment::class, 'doctor_id');
     }
+
+    public function services()
+    {
+        return $this->belongsToMany(Service::class, 'doctor_service', 'doctor_id', 'service_id')
+            ->withTimestamps();
+    }
     
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;

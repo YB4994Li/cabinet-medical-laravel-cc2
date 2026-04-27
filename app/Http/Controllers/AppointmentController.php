@@ -42,7 +42,7 @@ class AppointmentController extends Controller
         $patients = $currentUser->role === 'patient'
             ? collect([$currentUser])
             : User::where('role', 'patient')->orderBy('name')->get();
-        $doctors = User::where('role', 'doctor')->orderBy('name')->get();
+        $doctors = User::with('services')->where('role', 'doctor')->orderBy('name')->get();
         $services = Service::orderBy('name')->get();
 
         return view('appointments.create', compact('currentUser', 'patients', 'doctors', 'services'));
@@ -78,7 +78,7 @@ class AppointmentController extends Controller
         $patients = $currentUser->role === 'patient'
             ? collect([$currentUser])
             : User::where('role', 'patient')->orderBy('name')->get();
-        $doctors = User::where('role', 'doctor')->orderBy('name')->get();
+        $doctors = User::with('services')->where('role', 'doctor')->orderBy('name')->get();
         $services = Service::orderBy('name')->get();
 
         return view('appointments.edit', compact('appointment', 'currentUser', 'patients', 'doctors', 'services'));

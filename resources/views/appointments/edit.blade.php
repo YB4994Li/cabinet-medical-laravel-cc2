@@ -44,6 +44,9 @@
                         @foreach($doctors as $d)
                             <option value="{{ $d->id }}" @selected(old('doctor_id', $appointment->doctor_id) == $d->id)>
                                 {{ $d->name }}
+                                @if($d->services->isNotEmpty())
+                                    - {{ $d->services->pluck('name')->join(', ') }}
+                                @endif
                             </option>
                         @endforeach
                     </select>
