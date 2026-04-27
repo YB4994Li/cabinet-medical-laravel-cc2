@@ -7,10 +7,20 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\UserController;
+use Illuminate\Http\Request;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/language/{locale}', function (Request $request, string $locale) {
+    abort_unless(in_array($locale, ['en', 'es'], true), 404);
+
+    $request->session()->put('locale', $locale);
+    app()->setLocale($locale);
+
+    return back();
+})->name('language.switch');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

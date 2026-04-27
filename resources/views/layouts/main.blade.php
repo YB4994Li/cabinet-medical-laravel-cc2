@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <title>YBMedicalClinic</title>
@@ -13,10 +13,12 @@
     <!-- Top Navbar -->
     <header class="h-20 bg-white border-b border-slate-200 px-6 flex items-center justify-between">
         <div class="flex items-center gap-3 w-72">
-            <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-16 h-16 object-contain drop-shadow-sm">
+            <img src="{{ asset('images/logo.png') }}" alt="{{ __('app.brand.logo_alt') }}" class="w-16 h-16 object-contain drop-shadow-sm">
         </div>
 
         <div class="flex items-center gap-6">
+            @include('partials.language-switcher')
+
             @php
                 $unreadNotifications = Auth::user()->unreadNotifications()->latest()->take(5)->get();
                 $unreadNotificationCount = Auth::user()->unreadNotifications()->count();
@@ -24,7 +26,7 @@
 
             <div class="relative group">
                 <button type="button"
-                        aria-label="Notifications"
+                        aria-label="{{ __('app.nav.notifications') }}"
                         class="relative w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center">
                     <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0a3 3 0 0 1-6 0m6 0H9" />
@@ -40,15 +42,15 @@
                 <div class="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition absolute right-0 top-12 w-96 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
                     <div class="p-4 border-b border-slate-200 flex items-center justify-between">
                         <div>
-                            <p class="font-bold text-slate-900">Notifications</p>
-                            <p class="text-xs text-slate-500">{{ $unreadNotificationCount }} unread</p>
+                            <p class="font-bold text-slate-900">{{ __('app.nav.notifications') }}</p>
+                            <p class="text-xs text-slate-500">{{ __('app.nav.unread', ['count' => $unreadNotificationCount]) }}</p>
                         </div>
 
                         @if($unreadNotificationCount > 0)
                             <form method="POST" action="{{ route('notifications.readAll') }}">
                                 @csrf
                                 <button type="submit" class="text-xs font-bold text-blue-700 hover:text-blue-800">
-                                    Mark all read
+                                    {{ __('app.nav.mark_all_read') }}
                                 </button>
                             </form>
                         @endif
@@ -60,7 +62,7 @@
                                 @csrf
                                 <button type="submit" class="w-full text-left p-4 border-b border-slate-100 hover:bg-slate-50">
                                     <span class="block font-bold text-slate-900">
-                                        {{ $notification->data['title'] ?? 'Notification' }}
+                                        {{ $notification->data['title'] ?? __('app.nav.notification') }}
                                     </span>
                                     <span class="block text-sm text-slate-600 mt-1 leading-relaxed">
                                         {{ $notification->data['message'] ?? '' }}
@@ -72,7 +74,7 @@
                             </form>
                         @empty
                             <div class="p-6 text-center text-sm text-slate-500">
-                                No new notifications.
+                                {{ __('app.nav.no_new_notifications') }}
                             </div>
                         @endforelse
                     </div>
@@ -88,7 +90,7 @@
                 <div class="text-right">
                     <p class="font-bold">{{ Auth::user()->name }}</p>
                     <p class="text-xs text-slate-500 uppercase tracking-widest">
-                        {{ Auth::user()->role }}
+                        {{ __('app.roles.'.Auth::user()->role) }}
                     </p>
                 </div>
 
@@ -111,34 +113,34 @@
         <aside class="w-64 bg-white border-r border-slate-200 flex flex-col">
             <div class="p-6">
                 <p class="text-blue-700 font-extrabold uppercase tracking-widest">YBMedicalClinic</p>
-                <p class="text-xs text-slate-500 uppercase mt-1">Patients & Appointments</p>
+                <p class="text-xs text-slate-500 uppercase mt-1">{{ __('app.brand.tagline') }}</p>
             </div>
 
             <nav class="flex-1 px-4 space-y-2">
                 <a href="{{ route('dashboard') }}"
                    class="block px-4 py-3 rounded-xl font-bold {{ request()->routeIs('dashboard') ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-100' }}">
-                    Dashboard
+                    {{ __('app.nav.dashboard') }}
                 </a>
 
                 <a href="{{ route('appointments.index') }}"
                    class="block px-4 py-3 rounded-xl font-bold {{ request()->routeIs('appointments.*') ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-100' }}">
-                    Appointments
+                    {{ __('app.nav.appointments') }}
                 </a>
 
                 <a href="{{ route('services.index') }}"
                    class="block px-4 py-3 rounded-xl font-bold {{ request()->routeIs('services.*') ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-100' }}">
-                    Services
+                    {{ __('app.nav.services') }}
                 </a>
 
                 @if(Auth::user()->role === 'admin')
                 <a href="{{ route('doctors.index') }}"
                    class="block px-4 py-3 rounded-xl font-bold {{ request()->routeIs('doctors.*') ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-100' }}">
-                    Doctors
+                    {{ __('app.nav.doctors') }}
                 </a>
 
                 <a href="{{ route('users.index') }}"
                 class="block px-4 py-3 rounded-xl font-bold {{ request()->routeIs('users.*') ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-600' : 'text-slate-600 hover:bg-slate-100' }}">
-                    Users
+                    {{ __('app.nav.users') }}
                 </a>
                 @endif
             </nav>
@@ -147,14 +149,14 @@
                 @if(Auth::user()->role === 'patient')
                     <a href="{{ route('appointments.create') }}"
                        class="block text-center bg-blue-700 text-white px-4 py-3 rounded-xl font-bold hover:bg-blue-800">
-                        + Add New Entry
+                        {{ __('app.nav.add_new_entry') }}
                     </a>
                 @endif
 
                 <form method="POST" action="{{ route('logout') }}" class="{{ Auth::user()->role === 'patient' ? 'mt-4' : '' }}">
                     @csrf
                     <button class="w-full text-left px-4 py-3 rounded-xl font-bold text-red-600 hover:bg-red-50">
-                        Logout
+                        {{ __('app.nav.logout') }}
                     </button>
                 </form>
             </div>

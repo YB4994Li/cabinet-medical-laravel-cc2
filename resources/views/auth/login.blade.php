@@ -8,12 +8,12 @@
 
                 <div class="relative">
                     <div class="w-24 h-24 rounded-2xl bg-white shadow-sm border border-blue-100 flex items-center justify-center mb-8">
-                        <img src="{{ asset('images/logo.png') }}" alt="YBMedicalClinic logo" class="w-16 h-16 object-contain">
+                        <img src="{{ asset('images/logo.png') }}" alt="{{ __('app.brand.logo_alt') }}" class="w-16 h-16 object-contain">
                     </div>
 
                     <h1 class="text-4xl font-extrabold text-slate-950">YBMedicalClinic</h1>
                     <p class="mt-4 text-lg leading-relaxed text-blue-800 max-w-md">
-                        Patients, appointments, doctors, and services managed from one clean clinical dashboard.
+                        {{ __('app.auth.login_intro') }}
                     </p>
 
                     <div class="mt-10 space-y-4 max-w-md">
@@ -23,7 +23,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5-4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-3 8 3z" />
                                 </svg>
                             </span>
-                            <span class="font-semibold text-slate-800">Secure role-based access</span>
+                            <span class="font-semibold text-slate-800">{{ __('app.auth.secure_access') }}</span>
                         </div>
 
                         <div class="flex items-center gap-4 rounded-xl bg-white/70 border border-white p-4 shadow-sm">
@@ -32,7 +32,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3M5 11h14M7 21h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" />
                                 </svg>
                             </span>
-                            <span class="font-semibold text-slate-800">Appointment tracking and notifications</span>
+                            <span class="font-semibold text-slate-800">{{ __('app.auth.tracking_notifications') }}</span>
                         </div>
                     </div>
                 </div>
@@ -40,8 +40,8 @@
 
             <div class="p-8 sm:p-12 lg:p-14 flex flex-col justify-center">
                 <div class="mb-8">
-                    <h2 class="text-3xl font-extrabold text-slate-950">Welcome Back</h2>
-                    <p class="text-slate-500 mt-2">Access your medical clinic dashboard.</p>
+                    <h2 class="text-3xl font-extrabold text-slate-950">{{ __('app.auth.welcome_back') }}</h2>
+                    <p class="text-slate-500 mt-2">{{ __('app.auth.login_subtitle') }}</p>
                 </div>
 
                 <x-auth-session-status class="mb-5" :status="session('status')" />
@@ -51,7 +51,7 @@
 
                     <div>
                         <div class="flex items-center justify-between mb-2">
-                            <label for="email" class="text-sm font-bold text-slate-700 uppercase tracking-widest">Email Address</label>
+                            <label for="email" class="text-sm font-bold text-slate-700 uppercase tracking-widest">{{ __('app.auth.email_address') }}</label>
                         </div>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400">
@@ -67,10 +67,10 @@
 
                     <div>
                         <div class="flex items-center justify-between mb-2">
-                            <label for="password" class="text-sm font-bold text-slate-700 uppercase tracking-widest">Password</label>
+                            <label for="password" class="text-sm font-bold text-slate-700 uppercase tracking-widest">{{ __('app.auth.password') }}</label>
                             @if (Route::has('password.request'))
                                 <a class="text-sm font-bold text-blue-700 hover:text-blue-800" href="{{ route('password.request') }}">
-                                    Forgot Password?
+                                    {{ __('app.auth.forgot_password') }}
                                 </a>
                             @endif
                         </div>
@@ -88,17 +88,17 @@
 
                     <label for="remember_me" class="flex items-center gap-3 text-slate-600">
                         <input id="remember_me" type="checkbox" class="rounded border-slate-300 text-blue-700 shadow-sm focus:ring-blue-500" name="remember">
-                        <span>Remember this workstation</span>
+                        <span>{{ __('app.auth.remember_workstation') }}</span>
                     </label>
 
                     <button type="submit" class="w-full bg-blue-700 text-white py-4 rounded-xl font-extrabold text-lg hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">
-                        Login to Portal
+                        {{ __('app.auth.login_to_portal') }}
                     </button>
                 </form>
 
                 <div class="mt-8 pt-6 border-t border-slate-200 text-center text-slate-600">
-                    Need an account?
-                    <a href="{{ route('register') }}" class="font-bold text-blue-700 hover:text-blue-800">Create one</a>
+                    {{ __('app.auth.need_account') }}
+                    <a href="{{ route('register') }}" class="font-bold text-blue-700 hover:text-blue-800">{{ __('app.auth.create_one') }}</a>
                 </div>
             </div>
         </div>

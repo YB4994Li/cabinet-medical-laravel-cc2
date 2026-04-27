@@ -16,7 +16,11 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-slate-900 antialiased">
+    <body class="relative font-sans text-slate-900 antialiased">
+        <div class="fixed top-4 right-4 z-50">
+            @include('partials.language-switcher')
+        </div>
+
         {{ $slot }}
     </body>
 </html>

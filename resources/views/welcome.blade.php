@@ -13,31 +13,33 @@
             <nav class="max-w-6xl mx-auto flex items-center justify-between">
                 <a href="/" class="flex items-center gap-3">
                     <span class="w-12 h-12 rounded-xl bg-blue-700 flex items-center justify-center shadow-sm">
-                        <img src="{{ asset('images/logo.png') }}" alt="YBMedicalClinic logo" class="w-9 h-9 object-contain">
+                        <img src="{{ asset('images/logo.png') }}" alt="{{ __('app.brand.logo_alt') }}" class="w-9 h-9 object-contain">
                     </span>
                     <span>
                         <span class="block text-xl font-extrabold text-slate-950">YBMedicalClinic</span>
-                        <span class="block text-xs uppercase tracking-widest text-slate-500">Patients & Appointments</span>
+                        <span class="block text-xs uppercase tracking-widest text-slate-500">{{ __('app.brand.tagline') }}</span>
                     </span>
                 </a>
 
                 @if (Route::has('login'))
                     <div class="flex items-center gap-3">
+                        @include('partials.language-switcher')
+
                         @auth
                             <a href="{{ url('/dashboard') }}"
                                class="px-5 py-3 rounded-xl bg-blue-700 text-white font-bold hover:bg-blue-800">
-                                Dashboard
+                                {{ __('app.nav.dashboard') }}
                             </a>
                         @else
                             <a href="{{ route('login') }}"
                                class="px-5 py-3 rounded-xl text-slate-700 font-bold hover:bg-white hover:shadow-sm">
-                                Log in
+                                {{ __('app.welcome.log_in') }}
                             </a>
 
                             @if (Route::has('register'))
                                 <a href="{{ route('register') }}"
                                    class="px-5 py-3 rounded-xl border border-slate-300 bg-white font-bold text-slate-800 shadow-sm hover:border-blue-300 hover:text-blue-700">
-                                    Register
+                                    {{ __('app.auth.register') }}
                                 </a>
                             @endif
                         @endauth
@@ -51,47 +53,47 @@
                 <div class="p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
                     <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 text-sm font-bold w-fit">
                         <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                        Clinic workspace ready
+                        {{ __('app.welcome.ready') }}
                     </div>
 
                     <h1 class="mt-8 text-4xl sm:text-5xl font-extrabold text-slate-950 leading-tight">
-                        Manage appointments, doctors, and services in one place.
+                        {{ __('app.welcome.headline') }}
                     </h1>
 
                     <p class="mt-5 text-lg text-slate-600 leading-relaxed">
-                        YBMedicalClinic gives patients, doctors, and admins a clean dashboard for scheduling, tracking status, and keeping clinical services organized.
+                        {{ __('app.welcome.description') }}
                     </p>
 
                     <div class="mt-8 flex flex-col sm:flex-row gap-3">
                         @auth
                             <a href="{{ route('dashboard') }}"
                                class="text-center px-6 py-4 rounded-xl bg-blue-700 text-white font-extrabold hover:bg-blue-800">
-                                Open Dashboard
+                                {{ __('app.welcome.open_dashboard') }}
                             </a>
                         @else
                             <a href="{{ route('login') }}"
                                class="text-center px-6 py-4 rounded-xl bg-blue-700 text-white font-extrabold hover:bg-blue-800">
-                                Login to Portal
+                                {{ __('app.auth.login_to_portal') }}
                             </a>
                             <a href="{{ route('register') }}"
                                class="text-center px-6 py-4 rounded-xl border border-slate-300 bg-white text-slate-800 font-extrabold hover:border-blue-300 hover:text-blue-700">
-                                Create Account
+                                {{ __('app.auth.create_account') }}
                             </a>
                         @endauth
                     </div>
 
                     <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
-                            <p class="text-2xl font-extrabold text-slate-950">Role</p>
-                            <p class="text-sm text-slate-500 mt-1">Admin, doctor, patient</p>
+                            <p class="text-2xl font-extrabold text-slate-950">{{ __('app.welcome.role') }}</p>
+                            <p class="text-sm text-slate-500 mt-1">{{ __('app.welcome.role_text') }}</p>
                         </div>
                         <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
-                            <p class="text-2xl font-extrabold text-slate-950">Status</p>
-                            <p class="text-sm text-slate-500 mt-1">Confirm or cancel</p>
+                            <p class="text-2xl font-extrabold text-slate-950">{{ __('app.welcome.status') }}</p>
+                            <p class="text-sm text-slate-500 mt-1">{{ __('app.welcome.status_text') }}</p>
                         </div>
                         <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
-                            <p class="text-2xl font-extrabold text-slate-950">Alerts</p>
-                            <p class="text-sm text-slate-500 mt-1">Notifications and email</p>
+                            <p class="text-2xl font-extrabold text-slate-950">{{ __('app.welcome.alerts') }}</p>
+                            <p class="text-sm text-slate-500 mt-1">{{ __('app.welcome.alerts_text') }}</p>
                         </div>
                     </div>
                 </div>
@@ -105,8 +107,8 @@
                         <div class="bg-white/80 border border-white rounded-2xl shadow-sm p-5">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-xs font-bold uppercase tracking-widest text-slate-500">Today</p>
-                                    <h2 class="text-2xl font-extrabold mt-1">Appointment Queue</h2>
+                                    <p class="text-xs font-bold uppercase tracking-widest text-slate-500">{{ __('app.welcome.today') }}</p>
+                                    <h2 class="text-2xl font-extrabold mt-1">{{ __('app.welcome.appointment_queue') }}</h2>
                                 </div>
                                 <span class="w-12 h-12 rounded-xl bg-blue-700 text-white flex items-center justify-center">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -118,11 +120,11 @@
 
                         <div class="grid grid-cols-2 gap-4">
                             <div class="bg-white/80 border border-white rounded-2xl shadow-sm p-5">
-                                <p class="text-sm font-bold text-slate-500">Doctors</p>
+                                <p class="text-sm font-bold text-slate-500">{{ __('app.welcome.doctors') }}</p>
                                 <p class="text-4xl font-extrabold mt-2 text-slate-950">24</p>
                             </div>
                             <div class="bg-white/80 border border-white rounded-2xl shadow-sm p-5">
-                                <p class="text-sm font-bold text-slate-500">Services</p>
+                                <p class="text-sm font-bold text-slate-500">{{ __('app.welcome.services') }}</p>
                                 <p class="text-4xl font-extrabold mt-2 text-slate-950">18</p>
                             </div>
                         </div>
@@ -131,17 +133,17 @@
                             <div class="space-y-4">
                                 <div class="flex items-center justify-between">
                                     <div>
-                                        <p class="font-bold text-slate-950">Cardiology consultation</p>
-                                        <p class="text-sm text-slate-500">Dr. assigned, pending status</p>
+                                        <p class="font-bold text-slate-950">{{ __('app.welcome.cardiology') }}</p>
+                                        <p class="text-sm text-slate-500">{{ __('app.welcome.assigned_pending') }}</p>
                                     </div>
-                                    <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">PENDING</span>
+                                    <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">{{ __('app.welcome.pending') }}</span>
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <div>
-                                        <p class="font-bold text-slate-950">Dermatology follow-up</p>
-                                        <p class="text-sm text-slate-500">Patient notified by email</p>
+                                        <p class="font-bold text-slate-950">{{ __('app.welcome.dermatology') }}</p>
+                                        <p class="text-sm text-slate-500">{{ __('app.welcome.patient_notified') }}</p>
                                     </div>
-                                    <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">CONFIRMED</span>
+                                    <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">{{ __('app.welcome.confirmed') }}</span>
                                 </div>
                             </div>
                         </div>
