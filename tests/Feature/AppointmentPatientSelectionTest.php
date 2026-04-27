@@ -155,3 +155,34 @@ test('admins cannot update appointment status', function () {
 
     expect($appointment->refresh()->status)->toBe('pending');
 });
+
+test('appointment cards count all matching appointments across pagination', function () {
+    $doctor = User::factory()->create(['role' => 'doctor']);
+    $patient = User::factory()->create(['role' => 'patient']);
+    $service = Service::factory()->create();
+
+    foreach (['confirmed', 'confirmed', 'pending', 'pending', 'pending', 'cancelled', 'cancelled'] as $index => $status) {
+        Appointment::create([
+            'patient_id' => $patient->id,
+            'doctor_id' => $doctor->id,
+            'service_id' => $service->id,
+            'appointment_date' => '2026-05-'.str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT),
+            'appointment_time' => '10:30',
+            'status' => $status,
+        ]);
+    }
+
+    $this->actingAs($doctor)
+        ->get(route('appointments.index'))
+        ->assertOk()
+        ->assertSeeInOrder([
+            'Total Appointments',
+            '7',
+            'Confirmed',
+            '2',
+            'Pending',
+            '3',
+            'Cancelled',
+            '2',
+        ]);
+});

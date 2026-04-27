@@ -18,20 +18,31 @@ class AppointmentController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->role === 'admin') {
-            $appointments = Appointment::with(['patient', 'doctor', 'service'])
-                ->paginate(5);
-        } elseif ($user->role === 'doctor') {
-            $appointments = Appointment::with(['patient', 'doctor', 'service'])
-                ->where('doctor_id', $user->id)
-                ->paginate(5);
-        } else {
-            $appointments = Appointment::with(['patient', 'doctor', 'service'])
-                ->where('patient_id', $user->id)
-                ->paginate(5);
+        $appointmentsQuery = Appointment::query();
+
+        if ($user->role === 'doctor') {
+            $appointmentsQuery->where('doctor_id', $user->id);
+        } elseif ($user->role === 'patient') {
+            $appointmentsQuery->where('patient_id', $user->id);
         }
 
-        return view('appointments.index', compact('appointments'));
+        $statusCounts = (clone $appointmentsQuery)
+            ->selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        $appointmentStats = [
+            'total' => (clone $appointmentsQuery)->count(),
+            'confirmed' => (int) ($statusCounts['confirmed'] ?? 0),
+            'pending' => (int) ($statusCounts['pending'] ?? 0),
+            'cancelled' => (int) ($statusCounts['cancelled'] ?? 0),
+        ];
+
+        $appointments = $appointmentsQuery
+            ->with(['patient', 'doctor', 'service'])
+            ->paginate(5);
+
+        return view('appointments.index', compact('appointments', 'appointmentStats'));
     }
 
     public function create()

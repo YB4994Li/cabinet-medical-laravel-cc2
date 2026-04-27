@@ -18,22 +18,22 @@
 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
     <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
         <p class="text-xs font-bold text-slate-500 uppercase">Total Appointments</p>
-        <h2 class="text-4xl font-extrabold mt-3">{{ $appointments->total() }}</h2>
+        <h2 class="text-4xl font-extrabold mt-3">{{ $appointmentStats['total'] }}</h2>
     </div>
 
     <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
         <p class="text-xs font-bold text-slate-500 uppercase">Confirmed</p>
-        <h2 class="text-4xl font-extrabold mt-3">{{ $appointments->where('status', 'confirmed')->count() }}</h2>
+        <h2 class="text-4xl font-extrabold mt-3">{{ $appointmentStats['confirmed'] }}</h2>
     </div>
 
     <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
         <p class="text-xs font-bold text-slate-500 uppercase">Pending</p>
-        <h2 class="text-4xl font-extrabold mt-3">{{ $appointments->where('status', 'pending')->count() }}</h2>
+        <h2 class="text-4xl font-extrabold mt-3">{{ $appointmentStats['pending'] }}</h2>
     </div>
 
     <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
         <p class="text-xs font-bold text-slate-500 uppercase">Cancelled</p>
-        <h2 class="text-4xl font-extrabold mt-3">{{ $appointments->where('status', 'cancelled')->count() }}</h2>
+        <h2 class="text-4xl font-extrabold mt-3">{{ $appointmentStats['cancelled'] }}</h2>
     </div>
 </div>
 
