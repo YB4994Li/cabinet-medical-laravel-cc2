@@ -8,6 +8,7 @@ use App\Models\Service;
 use Illuminate\Http\Request;
 use App\Mail\AppointmentCreatedMail;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 
 class AppointmentController extends Controller
 {
@@ -33,16 +34,25 @@ class AppointmentController extends Controller
 
     public function create()
     {
-        $patients = User::where('role', 'patient')->get();
-        $doctors = User::where('role', 'doctor')->get();
-        $services = Service::all();
+        $currentUser = auth()->user();
+        $patients = $currentUser->role === 'patient'
+            ? collect([$currentUser])
+            : User::where('role', 'patient')->orderBy('name')->get();
+        $doctors = User::where('role', 'doctor')->orderBy('name')->get();
+        $services = Service::orderBy('name')->get();
 
-        return view('appointments.create', compact('patients', 'doctors', 'services'));
+        return view('appointments.create', compact('currentUser', 'patients', 'doctors', 'services'));
     }
 
     public function store(Request $request)
     {
-        $appointment = Appointment::create($request->all());
+        $currentUser = auth()->user();
+
+        if ($currentUser->role === 'patient') {
+            $request->merge(['patient_id' => $currentUser->id]);
+        }
+
+        $appointment = Appointment::create($request->validate($this->appointmentRules()));
 
         $appointment->load(['patient', 'doctor', 'service']);
 
@@ -54,21 +64,36 @@ class AppointmentController extends Controller
 
     public function edit(Appointment $appointment)
     {
-        $patients = User::where('role', 'patient')->get();
-        $doctors = User::where('role', 'doctor')->get();
-        $services = Service::all();
+        $this->authorizeAppointmentAccess($appointment);
 
-        return view('appointments.edit', compact('appointment', 'patients', 'doctors', 'services'));
+        $currentUser = auth()->user();
+        $patients = $currentUser->role === 'patient'
+            ? collect([$currentUser])
+            : User::where('role', 'patient')->orderBy('name')->get();
+        $doctors = User::where('role', 'doctor')->orderBy('name')->get();
+        $services = Service::orderBy('name')->get();
+
+        return view('appointments.edit', compact('appointment', 'currentUser', 'patients', 'doctors', 'services'));
     }
 
     public function update(Request $request, Appointment $appointment)
     {
-        $appointment->update($request->all());
+        $this->authorizeAppointmentAccess($appointment);
+
+        $currentUser = auth()->user();
+
+        if ($currentUser->role === 'patient') {
+            $request->merge(['patient_id' => $currentUser->id]);
+        }
+
+        $appointment->update($request->validate($this->appointmentRules()));
         return redirect()->route('appointments.index');
     }
 
     public function destroy(Appointment $appointment)
     {
+        $this->authorizeAppointmentAccess($appointment);
+
         $appointment->delete();
         return redirect()->route('appointments.index');
     }
@@ -124,5 +149,36 @@ class AppointmentController extends Controller
         ]);
 
         return redirect()->route('appointments.index');
+    }
+
+    private function appointmentRules(): array
+    {
+        return [
+            'patient_id' => [
+                'required',
+                Rule::exists('users', 'id')->where(fn ($query) => $query->where('role', 'patient')),
+            ],
+            'doctor_id' => [
+                'required',
+                Rule::exists('users', 'id')->where(fn ($query) => $query->where('role', 'doctor')),
+            ],
+            'service_id' => ['required', Rule::exists('services', 'id')],
+            'appointment_date' => ['required', 'date'],
+            'appointment_time' => ['required'],
+            'notes' => ['nullable', 'string', 'max:1000'],
+        ];
+    }
+
+    private function authorizeAppointmentAccess(Appointment $appointment): void
+    {
+        $user = auth()->user();
+
+        if ($user->role === 'patient' && $appointment->patient_id !== $user->id) {
+            abort(403);
+        }
+
+        if ($user->role === 'doctor' && $appointment->doctor_id !== $user->id) {
+            abort(403);
+        }
     }
 }

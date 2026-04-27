@@ -13,55 +13,95 @@
         <form action="{{ route('appointments.store') }}" method="POST">
             @csrf
 
-            <div class="grid grid-cols-2 gap-4 mb-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
 
                 <div>
                     <label class="block text-sm font-bold text-slate-600 mb-2">Patient</label>
-                    <select name="patient_id" class="w-full border border-slate-200 rounded-xl p-3">
-                        @foreach($patients as $p)
-                            <option value="{{ $p->id }}">{{ $p->name }}</option>
-                        @endforeach
-                    </select>
+                    @if($currentUser->role === 'patient')
+                        <input type="hidden" name="patient_id" value="{{ $currentUser->id }}">
+                        <input type="text"
+                               value="{{ $currentUser->name }}"
+                               readonly
+                               class="w-full border border-slate-200 rounded-xl p-3 bg-slate-100 text-slate-700">
+                    @else
+                        <select name="patient_id" required class="w-full border border-slate-200 rounded-xl p-3">
+                            <option value="">Select patient</option>
+                            @foreach($patients as $p)
+                                <option value="{{ $p->id }}" @selected(old('patient_id') == $p->id)>
+                                    {{ $p->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    @endif
+                    @error('patient_id')
+                        <p class="text-sm text-red-600 mt-2">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div>
                     <label class="block text-sm font-bold text-slate-600 mb-2">Doctor</label>
-                    <select name="doctor_id" class="w-full border border-slate-200 rounded-xl p-3">
+                    <select name="doctor_id" required class="w-full border border-slate-200 rounded-xl p-3">
+                        <option value="">Select doctor</option>
                         @foreach($doctors as $d)
-                            <option value="{{ $d->id }}">{{ $d->name }}</option>
+                            <option value="{{ $d->id }}" @selected(old('doctor_id') == $d->id)>
+                                {{ $d->name }}
+                            </option>
                         @endforeach
                     </select>
+                    @error('doctor_id')
+                        <p class="text-sm text-red-600 mt-2">{{ $message }}</p>
+                    @enderror
                 </div>
 
             </div>
 
             <div class="mb-5">
                 <label class="block text-sm font-bold text-slate-600 mb-2">Service</label>
-                <select name="service_id" class="w-full border border-slate-200 rounded-xl p-3">
+                <select name="service_id" required class="w-full border border-slate-200 rounded-xl p-3">
+                    <option value="">Select service</option>
                     @foreach($services as $s)
-                        <option value="{{ $s->id }}">{{ $s->name }}</option>
+                        <option value="{{ $s->id }}" @selected(old('service_id') == $s->id)>
+                            {{ $s->name }}
+                        </option>
                     @endforeach
                 </select>
+                @error('service_id')
+                    <p class="text-sm text-red-600 mt-2">{{ $message }}</p>
+                @enderror
             </div>
 
-            <div class="grid grid-cols-2 gap-4 mb-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
                 <div>
                     <label class="block text-sm font-bold text-slate-600 mb-2">Date</label>
                     <input type="date" name="appointment_date"
+                           value="{{ old('appointment_date') }}"
+                           required
                            class="w-full border border-slate-200 rounded-xl p-3">
+                    @error('appointment_date')
+                        <p class="text-sm text-red-600 mt-2">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div>
                     <label class="block text-sm font-bold text-slate-600 mb-2">Time</label>
                     <input type="time" name="appointment_time"
+                           value="{{ old('appointment_time') }}"
+                           required
                            class="w-full border border-slate-200 rounded-xl p-3">
+                    @error('appointment_time')
+                        <p class="text-sm text-red-600 mt-2">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
 
             <div class="mb-6">
                 <label class="block text-sm font-bold text-slate-600 mb-2">Notes</label>
                 <input type="text" name="notes"
+                       value="{{ old('notes') }}"
                        class="w-full border border-slate-200 rounded-xl p-3">
+                @error('notes')
+                    <p class="text-sm text-red-600 mt-2">{{ $message }}</p>
+                @enderror
             </div>
 
             <div class="flex justify-between">
