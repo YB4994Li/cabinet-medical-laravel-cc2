@@ -82,16 +82,25 @@
                 <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
 
-            <div class="text-right">
-                <p class="font-bold">{{ Auth::user()->name }}</p>
-                <p class="text-xs text-slate-500 uppercase tracking-widest">
-                    {{ Auth::user()->role }}
-                </p>
-            </div>
+            <a href="{{ route('profile.edit') }}"
+               class="flex items-center gap-3 rounded-xl px-3 py-2 hover:bg-slate-100 transition">
+                <div class="text-right">
+                    <p class="font-bold">{{ Auth::user()->name }}</p>
+                    <p class="text-xs text-slate-500 uppercase tracking-widest">
+                        {{ Auth::user()->role }}
+                    </p>
+                </div>
 
-            <div class="w-11 h-11 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
-                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-            </div>
+                @if(Auth::user()->profile_photo_url)
+                    <img src="{{ Auth::user()->profile_photo_url }}"
+                         alt="{{ Auth::user()->name }}"
+                         class="w-11 h-11 rounded-full object-cover border border-slate-200">
+                @else
+                    <div class="w-11 h-11 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
+                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                    </div>
+                @endif
+            </a>
         </div>
     </header>
 
