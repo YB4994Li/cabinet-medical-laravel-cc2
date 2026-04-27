@@ -7,10 +7,12 @@
         <p class="text-slate-500 mt-2">Manage patient bookings, doctors, services and appointment status.</p>
     </div>
 
-    <a href="{{ route('appointments.create') }}"
-       class="bg-blue-700 text-white px-5 py-3 rounded-xl font-bold shadow-sm hover:bg-blue-800">
-        + Add Appointment
-    </a>
+    @if(Auth::user()->role !== 'doctor')
+        <a href="{{ route('appointments.create') }}"
+           class="bg-blue-700 text-white px-5 py-3 rounded-xl font-bold shadow-sm hover:bg-blue-800">
+            + Add Appointment
+        </a>
+    @endif
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">

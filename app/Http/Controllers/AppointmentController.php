@@ -34,6 +34,8 @@ class AppointmentController extends Controller
 
     public function create()
     {
+        $this->authorizeAppointmentCreation();
+
         $currentUser = auth()->user();
         $patients = $currentUser->role === 'patient'
             ? collect([$currentUser])
@@ -46,6 +48,8 @@ class AppointmentController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorizeAppointmentCreation();
+
         $currentUser = auth()->user();
 
         if ($currentUser->role === 'patient') {
@@ -178,6 +182,13 @@ class AppointmentController extends Controller
         }
 
         if ($user->role === 'doctor' && $appointment->doctor_id !== $user->id) {
+            abort(403);
+        }
+    }
+
+    private function authorizeAppointmentCreation(): void
+    {
+        if (auth()->user()->role === 'doctor') {
             abort(403);
         }
     }

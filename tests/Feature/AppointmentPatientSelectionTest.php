@@ -61,3 +61,36 @@ test('patients can only create appointments for their own account', function () 
         return $mail->appointment->patient_id === $patient->id;
     });
 });
+
+test('doctors do not see appointment creation actions', function () {
+    $doctor = User::factory()->create(['role' => 'doctor']);
+
+    $response = $this->actingAs($doctor)->get(route('appointments.index'));
+
+    $response->assertOk();
+    $response->assertDontSee('+ Add Appointment');
+    $response->assertDontSee('+ Add New Entry');
+});
+
+test('doctors cannot create appointments directly', function () {
+    $doctor = User::factory()->create(['role' => 'doctor']);
+    $patient = User::factory()->create(['role' => 'patient']);
+    $service = Service::factory()->create();
+
+    $this->actingAs($doctor)
+        ->get(route('appointments.create'))
+        ->assertForbidden();
+
+    $this->actingAs($doctor)
+        ->post(route('appointments.store'), [
+            'patient_id' => $patient->id,
+            'doctor_id' => $doctor->id,
+            'service_id' => $service->id,
+            'appointment_date' => '2026-05-01',
+            'appointment_time' => '10:30',
+            'notes' => 'Doctor-created appointment',
+        ])
+        ->assertForbidden();
+
+    $this->assertDatabaseCount('appointments', 0);
+});
