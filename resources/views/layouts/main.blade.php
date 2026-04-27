@@ -134,14 +134,14 @@
             </nav>
 
             <div class="p-4 border-t border-slate-200">
-                @if(Auth::user()->role !== 'doctor')
+                @if(Auth::user()->role === 'patient')
                     <a href="{{ route('appointments.create') }}"
                        class="block text-center bg-blue-700 text-white px-4 py-3 rounded-xl font-bold hover:bg-blue-800">
                         + Add New Entry
                     </a>
                 @endif
 
-                <form method="POST" action="{{ route('logout') }}" class="{{ Auth::user()->role !== 'doctor' ? 'mt-4' : '' }}">
+                <form method="POST" action="{{ route('logout') }}" class="{{ Auth::user()->role === 'patient' ? 'mt-4' : '' }}">
                     @csrf
                     <button class="w-full text-left px-4 py-3 rounded-xl font-bold text-red-600 hover:bg-red-50">
                         Logout

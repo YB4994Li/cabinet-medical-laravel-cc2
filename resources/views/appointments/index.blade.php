@@ -7,7 +7,7 @@
         <p class="text-slate-500 mt-2">Manage patient bookings, doctors, services and appointment status.</p>
     </div>
 
-    @if(Auth::user()->role !== 'doctor')
+    @if(Auth::user()->role === 'patient')
         <a href="{{ route('appointments.create') }}"
            class="bg-blue-700 text-white px-5 py-3 rounded-xl font-bold shadow-sm hover:bg-blue-800">
             + Add Appointment
@@ -60,7 +60,7 @@
                     <th class="text-left p-4">Status</th>
                     <th class="text-left p-4">Actions</th>
 
-                    @if(Auth::user()->role === 'doctor' || Auth::user()->role === 'admin')
+                    @if(Auth::user()->role === 'doctor')
                         <th class="text-left p-4">Update Status</th>
                     @endif
                 </tr>
@@ -116,7 +116,7 @@
                         </div>
                     </td>
 
-                    @if(Auth::user()->role === 'doctor' || Auth::user()->role === 'admin')
+                    @if(Auth::user()->role === 'doctor')
                     <td class="p-4 whitespace-nowrap">
                         <form action="{{ route('appointments.updateStatus', $a->id) }}" method="POST" class="flex items-center gap-2">
                             @csrf
@@ -221,7 +221,7 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script>
-const canUpdateStatus = @json(Auth::user()->role === 'doctor' || Auth::user()->role === 'admin');
+const canUpdateStatus = @json(Auth::user()->role === 'doctor');
 const canEditDelete = @json(Auth::user()->role === 'admin' || Auth::user()->role === 'patient');
 const csrfToken = @json(csrf_token());
 const originalRows = document.getElementById('appointmentsTable').innerHTML;

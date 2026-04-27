@@ -1,6 +1,7 @@
 <?php
 
 use App\Mail\AppointmentCreatedMail;
+use App\Models\Appointment;
 use App\Models\Service;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
@@ -93,4 +94,64 @@ test('doctors cannot create appointments directly', function () {
         ->assertForbidden();
 
     $this->assertDatabaseCount('appointments', 0);
+});
+
+test('admins do not see appointment creation actions', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    $this->actingAs($admin)
+        ->get(route('appointments.index'))
+        ->assertOk()
+        ->assertDontSee('+ Add Appointment')
+        ->assertDontSee('+ Add New Entry');
+});
+
+test('admins cannot create appointments directly', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $patient = User::factory()->create(['role' => 'patient']);
+    $doctor = User::factory()->create(['role' => 'doctor']);
+    $service = Service::factory()->create();
+
+    $this->actingAs($admin)
+        ->get(route('appointments.create'))
+        ->assertForbidden();
+
+    $this->actingAs($admin)
+        ->post(route('appointments.store'), [
+            'patient_id' => $patient->id,
+            'doctor_id' => $doctor->id,
+            'service_id' => $service->id,
+            'appointment_date' => '2026-05-01',
+            'appointment_time' => '10:30',
+            'notes' => 'Admin-created appointment',
+        ])
+        ->assertForbidden();
+
+    $this->assertDatabaseCount('appointments', 0);
+});
+
+test('admins cannot update appointment status', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $patient = User::factory()->create(['role' => 'patient']);
+    $doctor = User::factory()->create(['role' => 'doctor']);
+    $service = Service::factory()->create();
+    $appointment = Appointment::create([
+        'patient_id' => $patient->id,
+        'doctor_id' => $doctor->id,
+        'service_id' => $service->id,
+        'appointment_date' => '2026-05-01',
+        'appointment_time' => '10:30',
+        'status' => 'pending',
+    ]);
+
+    $this->actingAs($admin)
+        ->get(route('appointments.index'))
+        ->assertOk()
+        ->assertDontSee('Update Status');
+
+    $this->actingAs($admin)
+        ->put(route('appointments.updateStatus', $appointment), ['status' => 'confirmed'])
+        ->assertForbidden();
+
+    expect($appointment->refresh()->status)->toBe('pending');
 });

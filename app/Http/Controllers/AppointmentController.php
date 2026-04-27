@@ -140,11 +140,11 @@ class AppointmentController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->role === 'doctor' && $appointment->doctor_id !== $user->id) {
+        if ($user->role !== 'doctor') {
             abort(403);
         }
 
-        if (!in_array($user->role, ['admin', 'doctor'])) {
+        if ($appointment->doctor_id !== $user->id) {
             abort(403);
         }
 
@@ -204,7 +204,7 @@ class AppointmentController extends Controller
 
     private function authorizeAppointmentCreation(): void
     {
-        if (auth()->user()->role === 'doctor') {
+        if (auth()->user()->role !== 'patient') {
             abort(403);
         }
     }

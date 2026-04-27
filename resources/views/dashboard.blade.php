@@ -9,7 +9,7 @@
     <p class="text-slate-500 mt-2">Operational performance for the clinic.</p>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
     <div class="bg-white p-6 rounded-2xl border shadow-sm">
         <p class="text-xs font-bold text-slate-500 uppercase">Total Appointments</p>
         <h2 class="text-4xl font-extrabold mt-3">{{ \App\Models\Appointment::count() }}</h2>
@@ -24,6 +24,13 @@
         <p class="text-xs font-bold text-slate-500 uppercase">Total Patients</p>
         <h2 class="text-4xl font-extrabold mt-3">
             {{ \App\Models\User::where('role','patient')->count() }}
+        </h2>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl border shadow-sm">
+        <p class="text-xs font-bold text-slate-500 uppercase">Total Doctors</p>
+        <h2 class="text-4xl font-extrabold mt-3">
+            {{ \App\Models\User::where('role','doctor')->count() }}
         </h2>
     </div>
 </div>
