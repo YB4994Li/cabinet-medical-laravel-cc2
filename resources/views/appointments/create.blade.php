@@ -12,6 +12,16 @@
     <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
         <form action="{{ route('appointments.store') }}" method="POST">
             @csrf
+            @php
+                $selectedServiceId = old('service_id');
+                $selectedDoctorId = old('doctor_id');
+                $doctorOptions = $doctors->map(fn ($doctor) => [
+                    'id' => $doctor->id,
+                    'name' => $doctor->name,
+                    'services' => $doctor->services->pluck('name')->values(),
+                    'serviceIds' => $doctor->services->pluck('id')->values(),
+                ])->values();
+            @endphp
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
 
@@ -39,19 +49,16 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-slate-600 mb-2">Doctor</label>
-                    <select name="doctor_id" required class="w-full border border-slate-200 rounded-xl p-3">
-                        <option value="">Select doctor</option>
-                        @foreach($doctors as $d)
-                            <option value="{{ $d->id }}" @selected(old('doctor_id') == $d->id)>
-                                {{ $d->name }}
-                                @if($d->services->isNotEmpty())
-                                    - {{ $d->services->pluck('name')->join(', ') }}
-                                @endif
+                    <label class="block text-sm font-bold text-slate-600 mb-2">Service</label>
+                    <select id="serviceSelect" name="service_id" required class="w-full border border-slate-200 rounded-xl p-3">
+                        <option value="">Select service first</option>
+                        @foreach($services as $s)
+                            <option value="{{ $s->id }}" @selected($selectedServiceId == $s->id)>
+                                {{ $s->name }}
                             </option>
                         @endforeach
                     </select>
-                    @error('doctor_id')
+                    @error('service_id')
                         <p class="text-sm text-red-600 mt-2">{{ $message }}</p>
                     @enderror
                 </div>
@@ -59,16 +66,20 @@
             </div>
 
             <div class="mb-5">
-                <label class="block text-sm font-bold text-slate-600 mb-2">Service</label>
-                <select name="service_id" required class="w-full border border-slate-200 rounded-xl p-3">
-                    <option value="">Select service</option>
-                    @foreach($services as $s)
-                        <option value="{{ $s->id }}" @selected(old('service_id') == $s->id)>
-                            {{ $s->name }}
-                        </option>
-                    @endforeach
+                <label class="block text-sm font-bold text-slate-600 mb-2">Doctor</label>
+                <select id="doctorSelect"
+                        name="doctor_id"
+                        required
+                        @disabled(!$selectedServiceId)
+                        class="w-full border border-slate-200 rounded-xl p-3 disabled:bg-slate-100 disabled:text-slate-400">
+                    <option value="">
+                        {{ $selectedServiceId ? 'Select doctor' : 'Choose a service first' }}
+                    </option>
                 </select>
-                @error('service_id')
+                <p id="doctorHelp" class="text-sm text-slate-500 mt-2">
+                    Doctors are filtered by the selected service.
+                </p>
+                @error('doctor_id')
                     <p class="text-sm text-red-600 mt-2">{{ $message }}</p>
                 @enderror
             </div>
@@ -133,5 +144,48 @@
     </div>
 
 </div>
+
+<script>
+const doctors = @js($doctorOptions);
+const selectedDoctorId = @js((string) $selectedDoctorId);
+const serviceSelect = document.getElementById('serviceSelect');
+const doctorSelect = document.getElementById('doctorSelect');
+const doctorHelp = document.getElementById('doctorHelp');
+
+function doctorLabel(doctor) {
+    return doctor.services.length ? `${doctor.name} - ${doctor.services.join(', ')}` : doctor.name;
+}
+
+function renderDoctorsForService(keepSelected = false) {
+    const serviceId = Number(serviceSelect.value);
+    const matchingDoctors = doctors.filter(doctor => doctor.serviceIds.includes(serviceId));
+    const previousValue = keepSelected ? selectedDoctorId : doctorSelect.value;
+
+    doctorSelect.innerHTML = '';
+
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = serviceId ? 'Select doctor' : 'Choose a service first';
+    doctorSelect.appendChild(placeholder);
+
+    matchingDoctors.forEach(doctor => {
+        const option = document.createElement('option');
+        option.value = doctor.id;
+        option.textContent = doctorLabel(doctor);
+        option.selected = String(doctor.id) === String(previousValue);
+        doctorSelect.appendChild(option);
+    });
+
+    doctorSelect.disabled = !serviceId || matchingDoctors.length === 0;
+    doctorHelp.textContent = !serviceId
+        ? 'Choose a service first to see available doctors.'
+        : matchingDoctors.length
+            ? 'Only doctors specialized in this service are available.'
+            : 'No doctors are assigned to this service yet.';
+}
+
+serviceSelect.addEventListener('change', () => renderDoctorsForService(false));
+renderDoctorsForService(true);
+</script>
 
 @endsection

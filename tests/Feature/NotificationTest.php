@@ -15,6 +15,7 @@ test('doctor receives an account notification when an appointment is created', f
     $patient = User::factory()->create(['role' => 'patient']);
     $doctor = User::factory()->create(['role' => 'doctor']);
     $service = Service::factory()->create();
+    $doctor->services()->attach($service);
 
     $this->actingAs($patient)->post(route('appointments.store'), [
         'doctor_id' => $doctor->id,

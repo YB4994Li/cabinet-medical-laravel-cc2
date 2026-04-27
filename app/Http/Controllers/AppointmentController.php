@@ -69,7 +69,7 @@ class AppointmentController extends Controller
             $request->merge(['patient_id' => $currentUser->id]);
         }
 
-        $appointment = Appointment::create($request->validate($this->appointmentRules()));
+        $appointment = Appointment::create($request->validate($this->appointmentRules($request)));
 
         $appointment->load(['patient', 'doctor', 'service']);
 
@@ -105,7 +105,7 @@ class AppointmentController extends Controller
             $request->merge(['patient_id' => $currentUser->id]);
         }
 
-        $appointment->update($request->validate($this->appointmentRules()));
+        $appointment->update($request->validate($this->appointmentRules($request)));
         return redirect()->route('appointments.index');
     }
 
@@ -182,7 +182,7 @@ class AppointmentController extends Controller
         return redirect()->route('appointments.index');
     }
 
-    private function appointmentRules(): array
+    private function appointmentRules(Request $request): array
     {
         return [
             'patient_id' => [
@@ -192,6 +192,8 @@ class AppointmentController extends Controller
             'doctor_id' => [
                 'required',
                 Rule::exists('users', 'id')->where(fn ($query) => $query->where('role', 'doctor')),
+                Rule::exists('doctor_service', 'doctor_id')
+                    ->where(fn ($query) => $query->where('service_id', $request->input('service_id'))),
             ],
             'service_id' => ['required', Rule::exists('services', 'id')],
             'appointment_date' => ['required', 'date'],

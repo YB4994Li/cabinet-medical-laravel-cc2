@@ -34,6 +34,7 @@ test('patients can only create appointments for their own account', function () 
     $otherPatient = User::factory()->create(['role' => 'patient']);
     $doctor = User::factory()->create(['role' => 'doctor']);
     $service = Service::factory()->create();
+    $doctor->services()->attach($service);
 
     $response = $this->actingAs($patient)->post(route('appointments.store'), [
         'patient_id' => $otherPatient->id,
@@ -61,6 +62,43 @@ test('patients can only create appointments for their own account', function () 
     Mail::assertSent(AppointmentCreatedMail::class, function ($mail) use ($patient) {
         return $mail->appointment->patient_id === $patient->id;
     });
+});
+
+test('patients can only choose doctors assigned to the selected service', function () {
+    Mail::fake();
+
+    $patient = User::factory()->create(['role' => 'patient']);
+    $cardiology = Service::factory()->create(['name' => 'Cardiology']);
+    $radiology = Service::factory()->create(['name' => 'Radiology']);
+    $cardiologyDoctor = User::factory()->create(['role' => 'doctor']);
+    $radiologyDoctor = User::factory()->create(['role' => 'doctor']);
+
+    $cardiologyDoctor->services()->attach($cardiology);
+    $radiologyDoctor->services()->attach($radiology);
+
+    $this->actingAs($patient)->post(route('appointments.store'), [
+        'doctor_id' => $radiologyDoctor->id,
+        'service_id' => $cardiology->id,
+        'appointment_date' => '2026-05-01',
+        'appointment_time' => '10:30',
+    ])
+        ->assertSessionHasErrors('doctor_id');
+
+    $this->assertDatabaseCount('appointments', 0);
+
+    $this->actingAs($patient)->post(route('appointments.store'), [
+        'doctor_id' => $cardiologyDoctor->id,
+        'service_id' => $cardiology->id,
+        'appointment_date' => '2026-05-01',
+        'appointment_time' => '10:30',
+    ])
+        ->assertRedirect(route('appointments.index'));
+
+    $this->assertDatabaseHas('appointments', [
+        'patient_id' => $patient->id,
+        'doctor_id' => $cardiologyDoctor->id,
+        'service_id' => $cardiology->id,
+    ]);
 });
 
 test('doctors do not see appointment creation actions', function () {
